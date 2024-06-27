@@ -15,11 +15,14 @@ fps = cap.get(cv2.CAP_PROP_FPS)
 
 # 비디오 프레임 수 가져오기
 fps = cap.get(cv2.CAP_PROP_FPS)
-print(fps)
+# print(fps)
 total_seconds = 10  # 첫 10초만 재생
 total_frames = int(fps * total_seconds)
 
-years = np.arange(0, total_seconds, 1/fps)  # 1초 단위가 아닌 프레임 단위
+years = np.arange(0, total_seconds, 1/fps) 
+#print(years)
+
+# 1초 단위가 아닌 프레임 단위
 data_xlse = pd.read_excel('C:/Users/나비/Downloads/Test_Excel/Face_1W_A1_S3.xlsx')
 data = data_xlse['box.width']
 
