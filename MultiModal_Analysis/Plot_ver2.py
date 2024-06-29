@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import pandas as pd  
 
 # 비디오 파일 경로
-video_path = 'C:/Users/나비/Downloads/Test_Video/Face_1W_A2_S2_landmark.mp4'
+video_path = 'C:/Users/나비/OneDrive/기울임 분석 A 그룹/Face_1W_A2_S2_landmark.mp4'
 cap = cv2.VideoCapture(video_path)
 
 '''
@@ -29,8 +29,8 @@ total_frames = int(fps * total_seconds)
 years = np.arange(0, total_seconds, 1/fps)
 
 # 1초 단위가 아닌 프레임 단위
-data_xlse = pd.read_excel('C:/Users/나비/Downloads/Test_Excel/Face_1W_A2_S2.xlsx')
-data = data_xlse['box.width']
+data_xlse = pd.read_excel('C:/Users/나비/OneDrive/기울임 분석 A 그룹/Face_1W_A2_S2.xlsx')
+data = data_xlse['box.center_y']
 
 
 # 특정 구간을 보여주기 위해 선언.
