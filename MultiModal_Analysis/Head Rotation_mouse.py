@@ -3,6 +3,7 @@ import mediapipe as mp
 import numpy as np
 import time
 import math
+import pandas as pd
 
 mp_face_mesh = mp.solutions.face_mesh
 face_mesh = mp_face_mesh.FaceMesh(min_detection_confidence=0.5, min_tracking_confidence=0.5, refine_landmarks = True)
@@ -12,14 +13,14 @@ mp_drawing = mp.solutions.drawing_utils
 drawing_spec = mp_drawing.DrawingSpec(thickness=1, circle_radius=1)
 
 
-video_path = 'D:/HCI_연구실_유재환/JaeHwanYou/AR Co/Synchrony/Education/Video/Plot Code/Face_1W_A1_S2.mp4'
+video_path = 'C:/Users/HarryAnnie/Downloads/Video/Face_1W_A2_S2.mp4'
 cap = cv2.VideoCapture(video_path)
 
 width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)
 height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
 
 fourcc = cv2.VideoWriter_fourcc(*'DIVX')  # Specify the codec to use
-output_video = cv2.VideoWriter('D:/HCI_연구실_유재환/JaeHwanYou/AR Co/Synchrony/Education/Video/Plot Code/Face_1W_A1_S2_HeadRotation.avi', fourcc, 25.0, (int(width), int(height)))  # Filename, codec, FPS, frame size
+output_video = cv2.VideoWriter('C:/Users/HarryAnnie/Downloads/A2_result/Face_1W_A2_S2_HeadRotation_mouse.avi', fourcc, 25.0, (int(width), int(height)))  # Filename, codec, FPS, frame size
 
 
 #왼쪽 눈
@@ -47,6 +48,13 @@ def iris_positin (iris_center, right_point, left_point):
     ratio = center_to_right_distance / total_distance
     return ratio
 
+
+# 최종 데이터 프레임을 저장하기 위한 빈 리스트 선언
+data = []
+# List to store lip distances
+lip_distances = []
+prev_lip = None
+frame_number = 0
 
 #cap = cv2.VideoCapture(0)
 
@@ -129,8 +137,22 @@ while cap.isOpened():
             cv2.putText(image, 'z: ' + str(np.round(z, 2)), (500, 150), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
             
             lip_distance = euclidean_distance(upper_lip_point, lower_lip_point)
-            cv2.putText(image, f'Lip Distance: {lip_distance:.5f}', (30, 80), cv2.FONT_HERSHEY_PLAIN, 1, (0, 255, 0), 1, cv2.LINE_AA)
+            
+            if prev_lip is not None:
+                delta_lip = lip_distance - prev_lip
+            else:
+                delta_lip = 0
 
+            # 입술 거리 값을 저장할 수 있는 코드 부분(추가)
+            lip_distances.append(delta_lip)  
+            prev_lip = lip_distance  
+
+            cv2.putText(image, f'Lip Distance: {lip_distance:.5f}', (30, 80), cv2.FONT_HERSHEY_PLAIN, 1, (0, 255, 0), 1, cv2.LINE_AA)
+        
+            # data 리스트에 저장할 값을 넣어 줌. 
+            data.append([frame_number, delta_lip])
+            frame_number += 1
+            
         '''
         mp_drawing.draw_landmarks(
             image = image,
@@ -168,3 +190,10 @@ while cap.isOpened():
 cap.release()
 output_video.release()
 cv2.destroyAllWindows()
+
+# 데이터 프레임 만들기.
+ratios_df = pd.DataFrame(lip_distances, columns=['Frame', 'lip_delta'])
+
+# 엑셀 파일로 저장하는 구간.
+excel_file_path = 'C:/Users/HarryAnnie/Downloads/A2_result/delta_ratio_A2.xlsx'
+ratios_df.to_excel(excel_file_path, index=False)

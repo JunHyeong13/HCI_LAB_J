@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import pandas as pd  
 
 # 비디오 파일 경로
-video_path = 'C:/Users/나비/OneDrive/기울임 분석 A 그룹/Face_1W_A2_S2_landmark.mp4'
+video_path = 'C:/Users/HarryAnnie/Downloads/Video/Face_1W_A2_S2_landmark.mp4'
 cap = cv2.VideoCapture(video_path)
 
 '''
@@ -17,8 +17,8 @@ fps = cap.get(cv2.CAP_PROP_FPS)
 fps = cap.get(cv2.CAP_PROP_FPS)
 # total_seconds = 300   # 첫 10초만 재생 || 60초 * 20분 = 1200
 
-start_seconds=4*60 # 시작할 부분의 시간
-end_seconds=5*60 # 끝낼 부분의 시간
+start_seconds = 5*60 # 시작할 부분의 시간
+end_seconds = 6*60 # 끝낼 부분의 시간
 total_seconds = end_seconds - start_seconds # 보여줄 전체 시간
 
 total_frames = int(fps * total_seconds)
@@ -29,7 +29,7 @@ total_frames = int(fps * total_seconds)
 years = np.arange(0, total_seconds, 1/fps)
 
 # 1초 단위가 아닌 프레임 단위
-data_xlse = pd.read_excel('C:/Users/나비/OneDrive/기울임 분석 A 그룹/Face_1W_A2_S2.xlsx')
+data_xlse = pd.read_excel('C:/Users/HarryAnnie/Downloads/File/Face_1W_A2_S2.xlsx')
 data = data_xlse['box.center_y']
 
 
@@ -47,9 +47,13 @@ line, = ax.plot(years, data_trimmed, lw=2)
 fig, ax = plt.subplots()
 line, = ax.plot(years, data, lw=2)
 '''
-
+'''
 y_min = np.floor(data.min()) # 주어진 숫자의 소수점 이하를 버리고, 정수 부분만 남기는 함수
 y_max = np.ceil(data.max()) # 인수로 받은 숫자를 반올림하여 반환.
+'''
+y_min = 0 # 주어진 숫자의 소수점 이하를 버리고, 정수 부분만 남기는 함수
+y_max = 250 # 인수로 받은 숫자를 반올림하여 반환.
+
 ax.set_ylim(y_min, y_max) # set_ylim의 경우, y축의 최솟값, 최댓값을 설정. 
 
 # x 축을 5초 단위로 눈금 설정

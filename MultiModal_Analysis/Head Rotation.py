@@ -106,7 +106,8 @@ with open(csv_file_path, mode='w', newline='') as file:
                 cv2.putText(image, 'z: ' + str(np.round(z, 2)), (500, 150), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
 
                 writer.writerow([frame_number, np.round(x, 2), np.round(y, 2), np.round(z, 2)])
-                    
+                frame_number +=1   
+                
             mp_drawing.draw_landmarks(
                 image = image,
                 landmark_list = face_landmarks,
@@ -118,7 +119,6 @@ with open(csv_file_path, mode='w', newline='') as file:
         cv2.imshow('Head Pose Estimation', image)
         output_video.write(image)
         
-        frame_number +=1
 
         if cv2.waitKey(5) & 0xFF == 27:
             break
