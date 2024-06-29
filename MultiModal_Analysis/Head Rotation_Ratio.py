@@ -3,6 +3,7 @@ import mediapipe as mp
 import numpy as np
 import time
 import math
+import pandas as pd
 
 mp_face_mesh = mp.solutions.face_mesh
 face_mesh = mp_face_mesh.FaceMesh(min_detection_confidence=0.5, min_tracking_confidence=0.5, refine_landmarks = True)
@@ -49,7 +50,7 @@ def iris_positin (iris_center, right_point, left_point):
 
 # empty list 
 ratios= []
-prev_ration = None
+prev_ratio = None
 
 #cap = cv2.VideoCapture(0)
 
@@ -149,8 +150,10 @@ while cap.isOpened():
             center_right, mesh_points[R_H_RIGHT], mesh_points[R_H_LEFT][0]
             )
 
-    
-
+    if prev_ratio is not None:
+        delta_ratio = ratio - prev_ratio
+    else:
+        delta_ratio = 0
 
     cv2.putText(image, f'Ratio: {ratio:.2f}', (30, 30), cv2.FONT_HERSHEY_PLAIN, 1, (0, 255, 0), 1, cv2.LINE_AA)
 
@@ -163,3 +166,7 @@ while cap.isOpened():
 cap.release()
 output_video.release()
 cv2.destroyAllWindows()
+
+# CSV 파일로 저장
+ratios_df = pd.DataFrame(ratios, columns=['Delta_Ratio'])
+ratios_df.to_csv('C:/Users/user/Downloads/Face Video/ratio_result/delta_ratios.csv', index=False)
