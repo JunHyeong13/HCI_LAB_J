@@ -13,9 +13,9 @@ mp_drawing = mp.solutions.drawing_utils
 
 drawing_spec = mp_drawing.DrawingSpec(thickness=1, circle_radius=1)
 
-# C:/Users/나비/Downloads/Face_1W_A1_S2.mp4
+# C:\Users\HarryAnnie\Downloads\Video
 #video_path = 'C:/Users/user/Downloads/Face Video/Face_1W_A1_S2.mp4'
-video_path = 'C:/Users/나비/Downloads/Face_1W_A2_S2.mp4'
+video_path = 'C:/Users/HarryAnnie/Downloads/Video/Face_1W_A2_S2.mp4'
 cap = cv2.VideoCapture(video_path)
 
 width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)
@@ -23,7 +23,7 @@ height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
 
 fourcc = cv2.VideoWriter_fourcc(*'DIVX')  # Specify the codec to use
 #output_video = cv2.VideoWriter('C:/Users/user/Downloads/Face Video/A1_result/Face_1W_A1_S2_HeadRotation_ratio.avi', fourcc, 25.0, (int(width), int(height)))  # Filename, codec, FPS, frame size
-output_video = cv2.VideoWriter('C:/Users/나비/Downloads/A2_result/Face_1W_A2_S2_HeadRotation_ratio.avi', fourcc, 25.0, (int(width), int(height)))  # Filename, codec, FPS, frame size
+output_video = cv2.VideoWriter('C:/Users/HarryAnnie/Downloads/A2_result/Face_1W_A2_S2_HeadRotation_ratio.avi', fourcc, 25.0, (int(width), int(height)))  # Filename, codec, FPS, frame size
 
 #왼쪽 눈
 LEFT_EYE = [362, 382, 381, 380, 374, 373, 390, 249, 263, 466, 388, 387, 386, 385, 384, 398]
@@ -157,6 +157,10 @@ while cap.isOpened():
     else:
         delta_ratio = 0
 
+    # 레티오스 라는 빈 리스트에 저장할 값을 넣어주기
+    ratios.append(delta_ratio)
+    prev_ratio = ratio
+
     cv2.putText(image, f'Ratio: {ratio:.2f}', (30, 30), cv2.FONT_HERSHEY_PLAIN, 1, (0, 255, 0), 1, cv2.LINE_AA)
     cv2.putText(image, f'Delta: {delta_ratio:.2f}', (30, 60), cv2.FONT_HERSHEY_PLAIN, 1, (0, 255, 0), 1, cv2.LINE_AA)
     
@@ -172,6 +176,6 @@ cv2.destroyAllWindows()
 
 # CSV 파일로 저장
 ratios_df = pd.DataFrame(ratios, columns=['Delta_Ratio'])
-output_dir = 'C:/Users/나비/Downloads/A2_result/'
+output_dir = 'C:/Users/HarryAnnie/Downloads/A2_result/'
 os.makedirs(output_dir, exist_ok=True)
 ratios_df.to_csv(output_dir,'delta_ratios.csv', index=False)
