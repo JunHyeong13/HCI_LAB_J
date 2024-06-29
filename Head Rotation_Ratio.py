@@ -11,22 +11,21 @@ mp_drawing = mp.solutions.drawing_utils
 
 drawing_spec = mp_drawing.DrawingSpec(thickness=1, circle_radius=1)
 
-
-video_path = 'D:/HCI_연구실_유재환/JaeHwanYou/AR Co/Synchrony/Education/Video/Plot Code/Face_1W_A1_S2.mp4'
+# C:/Users/user/Downloads/Face Video/
+video_path = 'C:/Users/user/Downloads/Face Video/Face_1W_A1_S2.mp4'
 cap = cv2.VideoCapture(video_path)
 
 width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)
 height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
 
 fourcc = cv2.VideoWriter_fourcc(*'DIVX')  # Specify the codec to use
-output_video = cv2.VideoWriter('D:/HCI_연구실_유재환/JaeHwanYou/AR Co/Synchrony/Education/Video/Plot Code/Face_1W_A1_S2_HeadRotation.avi', fourcc, 25.0, (int(width), int(height)))  # Filename, codec, FPS, frame size
+output_video = cv2.VideoWriter('C:/Users/user/Downloads/Face Video/Result/Face_1W_A1_S2_HeadRotation.avi', fourcc, 25.0, (int(width), int(height)))  # Filename, codec, FPS, frame size
 
 
 #왼쪽 눈
 LEFT_EYE = [362, 382, 381, 380, 374, 373, 390, 249, 263, 466, 388, 387, 386, 385, 384, 398]
 #오른쪽 눈
 RIGHT_EYE = [33, 7, 163, 144, 145, 153, 154, 155, 133, 173, 157, 158, 159, 160, 161, 246]
-
 
 RIGHT_IRIS = [469, 470, 471, 472]
 LEFT_IRIS = [474, 475, 476, 477]
@@ -35,26 +34,27 @@ R_H_RIGHT = [133]
 L_H_LEFT = [362]
 L_H_RIGHT = [263]
 
+# 두 점 사이의 거리 계산(유클리드 거리 계산 부분)
 def euclidean_distance(a, b):
     x1, y1, = a.ravel()
     x2, y2, = b.ravel()
     distance = math.sqrt((x2 - x1)**2 + (y2 - y1)**2)
     return distance
 
+# 눈 ratio 값. iris = 눈동자 가운데, left(=눈의 좌측에 해당), Right(=눈의 우측에 해당)
 def iris_positin (iris_center, right_point, left_point):
-    center_to_right_distance = euclidean_distance(iris_center, right_point)
-    total_distance = euclidean_distance(right_point, left_point)
-    ratio = center_to_right_distance / total_distance
-    return ratio
-
+    center_to_right_distance = euclidean_distance(iris_center, right_point) # 눈동자와 눈의 오른쪽 부분까지의 거리. 
+    total_distance = euclidean_distance(right_point, left_point) #눈 끝단의 왼쪽과 오른쪽 전체의 거리.
+    ratio = center_to_right_distance / total_distance # 눈동자와 눈의 오른쪽 부분 / 눈 끝단의 왼쪽과 오른쪽 부분의 거리
+    return ratio # 비율 값 반환. 
 
 #cap = cv2.VideoCapture(0)
 
+# 비디오 여는 부분. 
 while cap.isOpened():
     success, image = cap.read()
 
-    start = time.time()
-
+    start = time.time() # 영상이 시작되는 시간.
 
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
