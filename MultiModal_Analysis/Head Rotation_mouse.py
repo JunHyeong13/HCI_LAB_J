@@ -5,7 +5,7 @@ import time
 import math
 import pandas as pd
 
-mp_face_mesh = mp.solutions.face_mesh
+mp_face_mesh = mp.solutions.face_mesh 
 face_mesh = mp_face_mesh.FaceMesh(min_detection_confidence=0.5, min_tracking_confidence=0.5, refine_landmarks = True)
 
 mp_drawing = mp.solutions.drawing_utils
@@ -195,5 +195,5 @@ cv2.destroyAllWindows()
 ratios_df = pd.DataFrame(lip_distances, columns=['Frame', 'lip_delta'])
 
 # 엑셀 파일로 저장하는 구간.
-excel_file_path = 'C:/Users/HarryAnnie/Downloads/A2_result/delta_ratio_A2.xlsx'
+excel_file_path = 'C:/Users/HarryAnnie/Downloads/A2_result/delta_lip_A2.xlsx'
 ratios_df.to_excel(excel_file_path, index=False)

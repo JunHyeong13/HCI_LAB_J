@@ -14,7 +14,7 @@ mp_drawing = mp.solutions.drawing_utils
 
 drawing_spec = mp_drawing.DrawingSpec(thickness=1, circle_radius=1)
 
-video_path = 'C:/Users/HarryAnnie/Downloads/Video/Face_1W_A1_S2.mp4'
+video_path = 'C:/Users/HarryAnnie/Downloads/Video/Face_1W_A2_S2.mp4'
 cap = cv2.VideoCapture(video_path)
 
 width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)
@@ -22,7 +22,7 @@ height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
 
 fourcc = cv2.VideoWriter_fourcc(*'DIVX')  # Specify the codec to use
 #output_video = cv2.VideoWriter('C:/Users/user/Downloads/Face Video/A1_result/Face_1W_A1_S2_HeadRotation_ratio.avi', fourcc, 25.0, (int(width), int(height)))  # Filename, codec, FPS, frame size
-output_video = cv2.VideoWriter('C:/Users/HarryAnnie/Downloads/A1_result/Face_1W_A1_S2_HeadRotation_ratio.avi', fourcc, 25.0, (int(width), int(height)))  # Filename, codec, FPS, frame size
+output_video = cv2.VideoWriter('C:/Users/HarryAnnie/Downloads/A1_result/Face_1W_A2_S2_HeadRotation_ratio.avi', fourcc, 25.0, (int(width), int(height)))  # Filename, codec, FPS, frame size
 
 #왼쪽 눈
 LEFT_EYE = [362, 382, 381, 380, 374, 373, 390, 249, 263, 466, 388, 387, 386, 385, 384, 398]
