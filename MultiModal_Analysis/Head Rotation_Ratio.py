@@ -12,14 +12,14 @@ mp_drawing = mp.solutions.drawing_utils
 drawing_spec = mp_drawing.DrawingSpec(thickness=1, circle_radius=1)
 
 
-video_path = 'D:/HCI_연구실_유재환/JaeHwanYou/AR Co/Synchrony/Education/Video/Plot Code/Face_1W_A1_S2.mp4'
+video_path = 'C:/Users/user/Downloads/Face Video/Face_1W_A1_S2.mp4'
 cap = cv2.VideoCapture(video_path)
 
 width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)
 height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
 
 fourcc = cv2.VideoWriter_fourcc(*'DIVX')  # Specify the codec to use
-output_video = cv2.VideoWriter('D:/HCI_연구실_유재환/JaeHwanYou/AR Co/Synchrony/Education/Video/Plot Code/Face_1W_A1_S2_HeadRotation.avi', fourcc, 25.0, (int(width), int(height)))  # Filename, codec, FPS, frame size
+output_video = cv2.VideoWriter('C:/Users/user/Downloads/Face Video/A1_result/Face_1W_A1_S2_HeadRotation_ratio.avi', fourcc, 25.0, (int(width), int(height)))  # Filename, codec, FPS, frame size
 
 
 #왼쪽 눈
@@ -47,6 +47,9 @@ def iris_positin (iris_center, right_point, left_point):
     ratio = center_to_right_distance / total_distance
     return ratio
 
+# empty list 
+ratios= []
+prev_ration = None
 
 #cap = cv2.VideoCapture(0)
 
@@ -57,7 +60,6 @@ while cap.isOpened():
 
 
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-
     image.flags.writeable = False
 
     results = face_mesh.process(image)
@@ -146,6 +148,9 @@ while cap.isOpened():
     ratio = iris_positin(
             center_right, mesh_points[R_H_RIGHT], mesh_points[R_H_LEFT][0]
             )
+
+    
+
 
     cv2.putText(image, f'Ratio: {ratio:.2f}', (30, 30), cv2.FONT_HERSHEY_PLAIN, 1, (0, 255, 0), 1, cv2.LINE_AA)
 
