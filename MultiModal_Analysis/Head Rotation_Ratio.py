@@ -4,6 +4,7 @@ import numpy as np
 import time
 import math
 import pandas as pd
+import os
 
 mp_face_mesh = mp.solutions.face_mesh
 face_mesh = mp_face_mesh.FaceMesh(min_detection_confidence=0.5, min_tracking_confidence=0.5, refine_landmarks = True)
@@ -155,8 +156,15 @@ while cap.isOpened():
     else:
         delta_ratio = 0
 
-    cv2.putText(image, f'Ratio: {ratio:.2f}', (30, 30), cv2.FONT_HERSHEY_PLAIN, 1, (0, 255, 0), 1, cv2.LINE_AA)
+    # 레티오스 라는 빈 리시트에 저장할 값을 넣어주기. 
+    ratios.append(delta_ratio)
+    prev_ratio = ratio
 
+    cv2.putText(image, f'Ratio: {ratio:.2f}', (30, 30), cv2.FONT_HERSHEY_PLAIN, 1, (0, 255, 0), 1, cv2.LINE_AA)
+    
+    # 이전 레티오와 현재 레티오의 비율 차이 보여주는 구간. 
+    cv2.putText(image, f'Delta: {delta_ratio:.2f}', (30, 60), cv2.FONT_HERSHEY_PLAIN, 1, (0, 255, 0), 1, cv2.LINE_AA)
+    
     cv2.imshow('Head Pose Estimation', image)
     output_video.write(image)
 
@@ -169,4 +177,6 @@ cv2.destroyAllWindows()
 
 # CSV 파일로 저장
 ratios_df = pd.DataFrame(ratios, columns=['Delta_Ratio'])
-ratios_df.to_csv('C:/Users/user/Downloads/Face Video/ratio_result/delta_ratios.csv', index=False)
+os.chdir('C:/Users/user/Downloads/Face Video/ratio_result/')
+ratios_df.to_csv('delta_ratios.csv', index=False)
+# C:\Users\user\Downloads\Face Video\ratio_result
