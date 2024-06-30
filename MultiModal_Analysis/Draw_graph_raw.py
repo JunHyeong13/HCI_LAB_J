@@ -14,7 +14,7 @@ fps = cap.get(cv2.CAP_PROP_FPS)
 # 전체 그래프를 그리고 싶을 때
 total_seconds = 1200
 '''
-start_seconds = 4*60 # 시작할 부분의 시간
+start_seconds = 260 # 시작할 부분의 시간
 end_seconds = 5*60 # 끝낼 부분의 시간
 total_seconds = end_seconds - start_seconds # 보여줄 전체 시간
 

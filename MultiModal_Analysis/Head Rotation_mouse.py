@@ -42,19 +42,11 @@ def euclidean_distance(a, b):
     distance = math.sqrt((x2 - x1)**2 + (y2 - y1)**2)
     return distance
 
-def iris_positin (iris_center, right_point, left_point):
+def iris_position (iris_center, right_point, left_point):
     center_to_right_distance = euclidean_distance(iris_center, right_point)
     total_distance = euclidean_distance(right_point, left_point)
     ratio = center_to_right_distance / total_distance
     return ratio
-
-
-# 최종 데이터 프레임을 저장하기 위한 빈 리스트 선언
-data = []
-# List to store lip distances
-lip_distances = []
-prev_lip = None
-frame_number = 0
 
 #cap = cv2.VideoCapture(0)
 
@@ -138,21 +130,9 @@ while cap.isOpened():
             
             lip_distance = euclidean_distance(upper_lip_point, lower_lip_point)
             
-            if prev_lip is not None:
-                delta_lip = lip_distance - prev_lip
-            else:
-                delta_lip = 0
-
-            # 입술 거리 값을 저장할 수 있는 코드 부분(추가)
-            lip_distances.append(delta_lip)  
-            prev_lip = lip_distance  
-
             cv2.putText(image, f'Lip Distance: {lip_distance:.5f}', (30, 80), cv2.FONT_HERSHEY_PLAIN, 1, (0, 255, 0), 1, cv2.LINE_AA)
-        
-            # data 리스트에 저장할 값을 넣어 줌. 
-            data.append([frame_number, delta_lip])
-            frame_number += 1
             
+        
         '''
         mp_drawing.draw_landmarks(
             image = image,
@@ -166,20 +146,21 @@ while cap.isOpened():
         mesh_points = np.array([np.multiply([p.x, p.y], [img_w, img_h]).astype(int) for p in results.multi_face_landmarks[0].landmark])
     
     
-    (l_cx, l_cy), l_radius = cv2.minEnclosingCircle(mesh_points[LEFT_IRIS])
-    (r_cx, r_cy), r_radius = cv2.minEnclosingCircle(mesh_points[RIGHT_IRIS])
+        (l_cx, l_cy), l_radius = cv2.minEnclosingCircle(mesh_points[LEFT_IRIS])
+        (r_cx, r_cy), r_radius = cv2.minEnclosingCircle(mesh_points[RIGHT_IRIS])
 
-    center_left = np.array([l_cx, l_cy], dtype=np.int32)
-    center_right = np.array([r_cx, r_cy], dtype=np.int32)
+        center_left = np.array([l_cx, l_cy], dtype=np.int32)
+        center_right = np.array([r_cx, r_cy], dtype=np.int32)
+            
+        cv2.circle(image, center_left, int(l_radius), (255, 0, 255), 1, cv2.LINE_AA)
+        cv2.circle(image, center_right, int(r_radius), (255, 0, 255), 1, cv2.LINE_AA)
+
+        ratio = iris_position(
+                center_right, mesh_points[R_H_RIGHT], mesh_points[R_H_LEFT][0]
+                )
+
+        cv2.putText(image, f'Ratio: {ratio:.2f}', (30, 30), cv2.FONT_HERSHEY_PLAIN, 1, (0, 255, 0), 1, cv2.LINE_AA)
         
-    cv2.circle(image, center_left, int(l_radius), (255, 0, 255), 1, cv2.LINE_AA)
-    cv2.circle(image, center_right, int(r_radius), (255, 0, 255), 1, cv2.LINE_AA)
-
-    ratio = iris_positin(
-            center_right, mesh_points[R_H_RIGHT], mesh_points[R_H_LEFT][0]
-            )
-
-    cv2.putText(image, f'Ratio: {ratio:.2f}', (30, 30), cv2.FONT_HERSHEY_PLAIN, 1, (0, 255, 0), 1, cv2.LINE_AA)
 
     cv2.imshow('Head Pose Estimation', image)
     output_video.write(image)
@@ -190,10 +171,3 @@ while cap.isOpened():
 cap.release()
 output_video.release()
 cv2.destroyAllWindows()
-
-# 데이터 프레임 만들기.
-ratios_df = pd.DataFrame(lip_distances, columns=['Frame', 'lip_delta'])
-
-# 엑셀 파일로 저장하는 구간.
-excel_file_path = 'C:/Users/HarryAnnie/Downloads/A2_result/delta_lip_A2.xlsx'
-ratios_df.to_excel(excel_file_path, index=False)
