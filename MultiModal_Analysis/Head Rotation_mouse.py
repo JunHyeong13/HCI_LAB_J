@@ -12,16 +12,18 @@ mp_drawing = mp.solutions.drawing_utils
 
 drawing_spec = mp_drawing.DrawingSpec(thickness=1, circle_radius=1)
 
-
-video_path = 'C:/Users/HarryAnnie/Downloads/Video/Face_1W_A2_S2.mp4'
+# C:\\Users\\user\\Downloads\\Face Video\\
+#video_path = 'C:/Users/HarryAnnie/Downloads/Video/Face_1W_A2_S2.mp4'
+video_path = 'C:\\Users\\user\\Downloads\\Face Video\\Face_1W_A1_S2.mp4'
 cap = cv2.VideoCapture(video_path)
 
 width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)
 height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
 
 fourcc = cv2.VideoWriter_fourcc(*'DIVX')  # Specify the codec to use
-output_video = cv2.VideoWriter('C:/Users/HarryAnnie/Downloads/A2_result/Face_1W_A2_S2_HeadRotation_mouse.avi', fourcc, 25.0, (int(width), int(height)))  # Filename, codec, FPS, frame size
-
+output_video = cv2.VideoWriter('C:\\Users\\user\\Downloads\\Face Video\\A1_result\\Face_1W_A1_S2_HeadRotation_mouse.avi', fourcc, 25.0, (int(width), int(height)))  # Filename, codec, FPS, frame size
+# C:\Users\user\Downloads\Face Video\A2_result
+# C:/Users/HarryAnnie/Downloads/A2_result/
 
 #왼쪽 눈
 LEFT_EYE = [362, 382, 381, 380, 374, 373, 390, 249, 263, 466, 388, 387, 386, 385, 384, 398]
@@ -36,6 +38,9 @@ R_H_RIGHT = [133]
 L_H_LEFT = [362]
 L_H_RIGHT = [263]
 
+lip_distances = []
+lip_distance_differences = []
+
 def euclidean_distance(a, b):
     x1, y1, = a.ravel()
     x2, y2, = b.ravel()
@@ -48,18 +53,22 @@ def iris_position (iris_center, right_point, left_point):
     ratio = center_to_right_distance / total_distance
     return ratio
 
+# 이전 길이의  입 모양 거리.
+prev_lip_distance = None
+frame_count = 0
+
 #cap = cv2.VideoCapture(0)
 
 while cap.isOpened():
     success, image = cap.read()
+    if not success:
+        break
 
+    frame_count += 1
+    print("current frame : ",frame_count)
     start = time.time()
-
-
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-
     image.flags.writeable = False
-
     results = face_mesh.process(image)
 
     image.flags.writeable = True
@@ -129,7 +138,17 @@ while cap.isOpened():
             cv2.putText(image, 'z: ' + str(np.round(z, 2)), (500, 150), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
             
             lip_distance = euclidean_distance(upper_lip_point, lower_lip_point)
+            lip_distances.append(lip_distance)
             
+            if prev_lip_distance is not None:
+                lip_distance_difference = lip_distance - prev_lip_distance
+            else:
+                lip_distance_difference = 0  # 첫 프레임의 차이는 0으로 설정
+
+            lip_distance_differences.append(lip_distance_difference)
+            prev_lip_distance = lip_distance
+            
+        
             cv2.putText(image, f'Lip Distance: {lip_distance:.5f}', (30, 80), cv2.FONT_HERSHEY_PLAIN, 1, (0, 255, 0), 1, cv2.LINE_AA)
             
         
@@ -171,3 +190,12 @@ while cap.isOpened():
 cap.release()
 output_video.release()
 cv2.destroyAllWindows()
+
+df = pd.DataFrame({
+    "Frame": list(range(1, len(lip_distances) + 1)),
+    "Lip Distance": lip_distances,
+    "Lip Distance Difference": lip_distance_differences
+})
+
+df.to_csv('D:/Test/lip_distances_differences_A1.csv', index=False)
+print("Excel 파일이 완료되었습니다.")
