@@ -3,8 +3,9 @@ import mediapipe as mp
 import numpy as np
 import time
 import math
+import pandas as pd
 
-mp_face_mesh = mp.solutions.face_mesh
+mp_face_mesh = mp.solutions.face_mesh 
 face_mesh = mp_face_mesh.FaceMesh(min_detection_confidence=0.5, min_tracking_confidence=0.5, refine_landmarks = True)
 
 mp_drawing = mp.solutions.drawing_utils
@@ -12,14 +13,14 @@ mp_drawing = mp.solutions.drawing_utils
 drawing_spec = mp_drawing.DrawingSpec(thickness=1, circle_radius=1)
 
 
-video_path = 'D:/HCI_연구실_유재환/JaeHwanYou/AR Co/Synchrony/Education/Video/Plot Code/Face_1W_A1_S2.mp4'
+video_path = 'C:/Users/HarryAnnie/Downloads/Video/Face_1W_A2_S2.mp4'
 cap = cv2.VideoCapture(video_path)
 
 width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)
 height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
 
 fourcc = cv2.VideoWriter_fourcc(*'DIVX')  # Specify the codec to use
-output_video = cv2.VideoWriter('D:/HCI_연구실_유재환/JaeHwanYou/AR Co/Synchrony/Education/Video/Plot Code/Face_1W_A1_S2_HeadRotation.avi', fourcc, 25.0, (int(width), int(height)))  # Filename, codec, FPS, frame size
+output_video = cv2.VideoWriter('C:/Users/HarryAnnie/Downloads/A2_result/Face_1W_A2_S2_HeadRotation_mouse.avi', fourcc, 25.0, (int(width), int(height)))  # Filename, codec, FPS, frame size
 
 
 #왼쪽 눈
@@ -41,12 +42,11 @@ def euclidean_distance(a, b):
     distance = math.sqrt((x2 - x1)**2 + (y2 - y1)**2)
     return distance
 
-def iris_positin (iris_center, right_point, left_point):
+def iris_position (iris_center, right_point, left_point):
     center_to_right_distance = euclidean_distance(iris_center, right_point)
     total_distance = euclidean_distance(right_point, left_point)
     ratio = center_to_right_distance / total_distance
     return ratio
-
 
 #cap = cv2.VideoCapture(0)
 
@@ -129,8 +129,10 @@ while cap.isOpened():
             cv2.putText(image, 'z: ' + str(np.round(z, 2)), (500, 150), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
             
             lip_distance = euclidean_distance(upper_lip_point, lower_lip_point)
+            
             cv2.putText(image, f'Lip Distance: {lip_distance:.5f}', (30, 80), cv2.FONT_HERSHEY_PLAIN, 1, (0, 255, 0), 1, cv2.LINE_AA)
-
+            
+        
         '''
         mp_drawing.draw_landmarks(
             image = image,
@@ -144,20 +146,21 @@ while cap.isOpened():
         mesh_points = np.array([np.multiply([p.x, p.y], [img_w, img_h]).astype(int) for p in results.multi_face_landmarks[0].landmark])
     
     
-    (l_cx, l_cy), l_radius = cv2.minEnclosingCircle(mesh_points[LEFT_IRIS])
-    (r_cx, r_cy), r_radius = cv2.minEnclosingCircle(mesh_points[RIGHT_IRIS])
+        (l_cx, l_cy), l_radius = cv2.minEnclosingCircle(mesh_points[LEFT_IRIS])
+        (r_cx, r_cy), r_radius = cv2.minEnclosingCircle(mesh_points[RIGHT_IRIS])
 
-    center_left = np.array([l_cx, l_cy], dtype=np.int32)
-    center_right = np.array([r_cx, r_cy], dtype=np.int32)
+        center_left = np.array([l_cx, l_cy], dtype=np.int32)
+        center_right = np.array([r_cx, r_cy], dtype=np.int32)
+            
+        cv2.circle(image, center_left, int(l_radius), (255, 0, 255), 1, cv2.LINE_AA)
+        cv2.circle(image, center_right, int(r_radius), (255, 0, 255), 1, cv2.LINE_AA)
+
+        ratio = iris_position(
+                center_right, mesh_points[R_H_RIGHT], mesh_points[R_H_LEFT][0]
+                )
+
+        cv2.putText(image, f'Ratio: {ratio:.2f}', (30, 30), cv2.FONT_HERSHEY_PLAIN, 1, (0, 255, 0), 1, cv2.LINE_AA)
         
-    cv2.circle(image, center_left, int(l_radius), (255, 0, 255), 1, cv2.LINE_AA)
-    cv2.circle(image, center_right, int(r_radius), (255, 0, 255), 1, cv2.LINE_AA)
-
-    ratio = iris_positin(
-            center_right, mesh_points[R_H_RIGHT], mesh_points[R_H_LEFT][0]
-            )
-
-    cv2.putText(image, f'Ratio: {ratio:.2f}', (30, 30), cv2.FONT_HERSHEY_PLAIN, 1, (0, 255, 0), 1, cv2.LINE_AA)
 
     cv2.imshow('Head Pose Estimation', image)
     output_video.write(image)

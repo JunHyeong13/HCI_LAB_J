@@ -4,7 +4,6 @@ import numpy as np
 import time
 import math
 import pandas as pd
-import os
 
 mp_face_mesh = mp.solutions.face_mesh
 face_mesh = mp_face_mesh.FaceMesh(min_detection_confidence=0.5, min_tracking_confidence=0.5, refine_landmarks = True)
@@ -13,16 +12,15 @@ mp_drawing = mp.solutions.drawing_utils
 
 drawing_spec = mp_drawing.DrawingSpec(thickness=1, circle_radius=1)
 
-
-video_path = 'C:/Users/user/Downloads/Face Video/Face_1W_A1_S2.mp4'
+video_path = 'C:/Users/HarryAnnie/Downloads/Video/Face_1W_A2_S2.mp4'
 cap = cv2.VideoCapture(video_path)
 
 width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)
 height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
 
 fourcc = cv2.VideoWriter_fourcc(*'DIVX')  # Specify the codec to use
-output_video = cv2.VideoWriter('C:/Users/user/Downloads/Face Video/A1_result/Face_1W_A1_S2_HeadRotation_ratio.avi', fourcc, 25.0, (int(width), int(height)))  # Filename, codec, FPS, frame size
-
+#output_video = cv2.VideoWriter('C:/Users/user/Downloads/Face Video/A1_result/Face_1W_A1_S2_HeadRotation_ratio.avi', fourcc, 25.0, (int(width), int(height)))  # Filename, codec, FPS, frame size
+output_video = cv2.VideoWriter('C:/Users/HarryAnnie/Downloads/A1_result/Face_1W_A2_S2_HeadRotation_ratio.avi', fourcc, 25.0, (int(width), int(height)))  # Filename, codec, FPS, frame size
 
 #왼쪽 눈
 LEFT_EYE = [362, 382, 381, 380, 374, 373, 390, 249, 263, 466, 388, 387, 386, 385, 384, 398]
@@ -41,26 +39,31 @@ def euclidean_distance(a, b):
     x1, y1, = a.ravel()
     x2, y2, = b.ravel()
     distance = math.sqrt((x2 - x1)**2 + (y2 - y1)**2)
-    return distance
+    return distance 
 
-def iris_positin (iris_center, right_point, left_point):
+def iris_position (iris_center, right_point, left_point):
     center_to_right_distance = euclidean_distance(iris_center, right_point)
     total_distance = euclidean_distance(right_point, left_point)
     ratio = center_to_right_distance / total_distance
     return ratio
 
-# empty list 
+# ratio 값을 저장하기 위한 리스트
 ratios= []
 prev_ratio = None
+frame_number = 0
+
+# 최종 데이터 프레임을 저장하기 위한 빈 리스트 선언
+data = []
 
 #cap = cv2.VideoCapture(0)
 
 while cap.isOpened():
     success, image = cap.read()
+    if not success:
+        break
 
     start = time.time()
-
-
+    
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     image.flags.writeable = False
 
@@ -96,8 +99,8 @@ while cap.isOpened():
             # 영상 matrix
             focal_length = 1 * img_w
             cam_matrix = np.array([ [focal_length, 0, img_h/2],
-                                       [0, focal_length, img_w/2],
-                                       [0, 0, 1]])
+                                    [0, focal_length, img_w/2],
+                                    [0, 0, 1]])
 
             dist_matrix = np.zeros((4, 1), dtype = np.float64)
 
@@ -127,44 +130,37 @@ while cap.isOpened():
             cv2.putText(image, 'x: ' + str(np.round(x, 2)), (500, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
             cv2.putText(image, 'y: ' + str(np.round(y, 2)), (500, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
             cv2.putText(image, 'z: ' + str(np.round(z, 2)), (500, 150), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
-        '''
-        mp_drawing.draw_landmarks(
-            image = image,
-            landmark_list = face_landmarks,
-            connections= mp_face_mesh.FACEMESH_CONTOURS, # 얼굴 주위에 메쉬를 그리는 부분.
-            landmark_drawing_spec = drawing_spec,
-            connection_drawing_spec = drawing_spec
-        )
-        '''
-        
-        mesh_points = np.array([np.multiply([p.x, p.y], [img_w, img_h]).astype(int) for p in results.multi_face_landmarks[0].landmark])
-    (l_cx, l_cy), l_radius = cv2.minEnclosingCircle(mesh_points[LEFT_IRIS])
-    (r_cx, r_cy), r_radius = cv2.minEnclosingCircle(mesh_points[RIGHT_IRIS])
-
-    center_left = np.array([l_cx, l_cy], dtype=np.int32)
-    center_right = np.array([r_cx, r_cy], dtype=np.int32)
-        
-    cv2.circle(image, center_left, int(l_radius), (255, 0, 255), 1, cv2.LINE_AA)
-    cv2.circle(image, center_right, int(r_radius), (255, 0, 255), 1, cv2.LINE_AA)
-
-    ratio = iris_positin(
-            center_right, mesh_points[R_H_RIGHT], mesh_points[R_H_LEFT][0]
+            '''
+            mp_drawing.draw_landmarks(
+                image = image,
+                landmark_list = face_landmarks,
+                connections= mp_face_mesh.FACEMESH_CONTOURS, # 얼굴 주위에 메쉬를 그리는 부분.
+                landmark_drawing_spec = drawing_spec,
+                connection_drawing_spec = drawing_spec
             )
+            '''
+            
+        mesh_points = np.array([np.multiply([p.x, p.y], [img_w, img_h]).astype(int) for p in results.multi_face_landmarks[0].landmark])
+        (l_cx, l_cy), l_radius = cv2.minEnclosingCircle(mesh_points[LEFT_IRIS])
+        (r_cx, r_cy), r_radius = cv2.minEnclosingCircle(mesh_points[RIGHT_IRIS])
 
-    if prev_ratio is not None:
-        delta_ratio = ratio - prev_ratio
-    else:
-        delta_ratio = 0
+        center_left = np.array([l_cx, l_cy], dtype=np.int32)
+        center_right = np.array([r_cx, r_cy], dtype=np.int32)
+            
+        cv2.circle(image, center_left, int(l_radius), (255, 0, 255), 1, cv2.LINE_AA)
+        cv2.circle(image, center_right, int(r_radius), (255, 0, 255), 1, cv2.LINE_AA)
 
-    # 레티오스 라는 빈 리시트에 저장할 값을 넣어주기. 
-    ratios.append(delta_ratio)
-    prev_ratio = ratio
+        ratio = iris_position(
+                center_right, mesh_points[R_H_RIGHT], mesh_points[R_H_LEFT][0]
+                )
+
+        if prev_ratio is not None:
+            delta_ratio = ratio - prev_ratio
+        else:
+            delta_ratio = 0
 
     cv2.putText(image, f'Ratio: {ratio:.2f}', (30, 30), cv2.FONT_HERSHEY_PLAIN, 1, (0, 255, 0), 1, cv2.LINE_AA)
-    
-    # 이전 레티오와 현재 레티오의 비율 차이 보여주는 구간. 
-    cv2.putText(image, f'Delta: {delta_ratio:.2f}', (30, 60), cv2.FONT_HERSHEY_PLAIN, 1, (0, 255, 0), 1, cv2.LINE_AA)
-    
+
     cv2.imshow('Head Pose Estimation', image)
     output_video.write(image)
 
@@ -177,6 +173,4 @@ cv2.destroyAllWindows()
 
 # CSV 파일로 저장
 ratios_df = pd.DataFrame(ratios, columns=['Delta_Ratio'])
-os.chdir('C:/Users/user/Downloads/Face Video/ratio_result/')
-ratios_df.to_csv('delta_ratios.csv', index=False)
-# C:\Users\user\Downloads\Face Video\ratio_result
+ratios_df.to_csv('C:/Users/user/Downloads/Face Video/ratio_result/delta_ratios.csv', index=False)

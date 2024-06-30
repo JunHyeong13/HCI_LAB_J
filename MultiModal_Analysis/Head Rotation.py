@@ -6,10 +6,11 @@ import csv
 
 
 mp_face_mesh = mp.solutions.face_mesh
+# 랜드 마크 감지를 위한 함수
 face_mesh = mp_face_mesh.FaceMesh(min_detection_confidence=0.5, min_tracking_confidence=0.5)
 
+# 그리기 툴
 mp_drawing = mp.solutions.drawing_utils
-
 drawing_spec = mp_drawing.DrawingSpec(thickness=1, circle_radius=1)
 
 # C:/Users/user/Downloads/Face Video 'D:/HCI_연구실_유재환/JaeHwanYou/AR Co/Synchrony/Education/Video/Plot Code/
@@ -105,7 +106,8 @@ with open(csv_file_path, mode='w', newline='') as file:
                 cv2.putText(image, 'z: ' + str(np.round(z, 2)), (500, 150), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
 
                 writer.writerow([frame_number, np.round(x, 2), np.round(y, 2), np.round(z, 2)])
-                    
+                frame_number +=1   
+                
             mp_drawing.draw_landmarks(
                 image = image,
                 landmark_list = face_landmarks,
@@ -117,7 +119,6 @@ with open(csv_file_path, mode='w', newline='') as file:
         cv2.imshow('Head Pose Estimation', image)
         output_video.write(image)
         
-        frame_number +=1
 
         if cv2.waitKey(5) & 0xFF == 27:
             break
