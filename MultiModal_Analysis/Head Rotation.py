@@ -14,14 +14,14 @@ mp_drawing = mp.solutions.drawing_utils
 drawing_spec = mp_drawing.DrawingSpec(thickness=1, circle_radius=1)
 
 # C:/Users/user/Downloads/Face Video 'D:/HCI_연구실_유재환/JaeHwanYou/AR Co/Synchrony/Education/Video/Plot Code/
-video_path = 'C:/Users/user/Downloads/Face Video/Face_1W_A2_S2.mp4'
+video_path = 'C:/Users/user/Downloads/Face Video/Face_1W_A1_S2.mp4'
 cap = cv2.VideoCapture(video_path)
 
 width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)
 height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
 
 fourcc = cv2.VideoWriter_fourcc(*'DIVX')  # Specify the codec to use
-output_video = cv2.VideoWriter('C:/Users/user/Downloads/Face Video/A2_result/Face_1W_A2_S2_HeadRotation.avi', fourcc, 25.0, (int(width), int(height)))  # Filename, codec, FPS, frame size
+output_video = cv2.VideoWriter('C:/Users/user/Downloads/Face Video/A2_result/Face_1W_A1_S2_HeadRotation.avi', fourcc, 25.0, (int(width), int(height)))  # Filename, codec, FPS, frame size
 
 # CSV file로 값을 저장하기. 
 csv_file_path = 'head_pose_coordinates_A2.csv'
