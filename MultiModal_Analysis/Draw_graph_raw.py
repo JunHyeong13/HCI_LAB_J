@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import pandas as pd  
 
 # 그래프 하나 그려보기 C:\\Users\\user\\Downloads\\Face Video\\ Face_1W_A1_S2_HeadRotation_ratio   /Face_1W_A1_S2_central
-video_path = 'C:/Users/user/Downloads/Face Video/Face_1W_A2_S2_HeadRotation_ratio.AVI' # A2 4min 20sec
+video_path = 'C:/Users/user/Downloads/Face Video/Face_1W_A1_S2_central.mp4' # A2 4min 20sec
 
 cap = cv2.VideoCapture(video_path)
 
@@ -12,20 +12,20 @@ cap = cv2.VideoCapture(video_path)
 fps = cap.get(cv2.CAP_PROP_FPS)
 print(fps)
 
-'''
+'''ㄴ
 # 전체 그래프를 그리고 싶을 때
 total_seconds = 1200
 '''
 start_seconds = 240 # 시작할 부분의 시간
-end_seconds = 300 # 끝낼 부분의 시간
+end_seconds = 270 # 끝낼 부분의 시간
 total_seconds = end_seconds - start_seconds # 보여줄 전체 시간
 
 total_frames = int(fps * total_seconds)
 years = np.arange(0, total_seconds, 1/fps)
 
 # 1초 단위가 아닌 프레임 단위
-data_xlse = pd.read_excel('C:/Users/user/Downloads/Face Video/delta_ratio_A2.xlsx') # head_pose_coordinates_A1.csv || Face_1W_A1_S2_central.xlsx 
-data = data_xlse['Ratio_delta'] # box 중점의 y좌표 값을 기준. # Lip Distance Difference || box.center_y
+data_xlse = pd.read_excel('C:/Users/user/Downloads/Face Video/Face_1W_A1_S2_central.xlsx') # head_pose_coordinates_A1.csv || Face_1W_A1_S2_central.xlsx 
+data = data_xlse['box.center_y'] # box 중점의 y좌표 값을 기준. # Lip Distance Difference || box.center_y
 
 #  보여줄 시간을 정했을 때, 그 부분에 대해서만 보여주기 위해 지정하는 부분.
 #data_trimmed = data[:len(years)]
@@ -46,7 +46,7 @@ y_max = np.ceil(data.max()) # 인수로 받은 숫자를 반올림하여 반환.
 ax.set_ylim(y_min, y_max) # set_ylim의 경우, y축의 최솟값, 최댓값을 설정. 
 
 # x 축을 30초 단위로 눈금 설정
-xticks = np.arange(0, total_seconds + 1, 5)
+xticks = np.arange(0, total_seconds + 1, 1)
 ax.set_xticks(xticks)
 #ax.set_xticklabels(xticks)
 ax.set_xticklabels((xticks + start_seconds).astype(int)) # 시작하는 부분의 숫자를 x 레이블에 표시.

@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import pandas as pd  
 
 # 비디오 파일 경로
-video_path = 'C:/Users/user/Downloads/Face Video/Face_1W_A1_S2_central.mp4' # C:\Users\user\Downloads\Face Video
+video_path = 'C:/Users/user/Downloads/Face Video/FFace_1W_A2_S2_HeadRotation_ratio.AVI' # C:\Users\user\Downloads\Face Video
 cap = cv2.VideoCapture(video_path)
 
 '''
@@ -17,8 +17,8 @@ fps = cap.get(cv2.CAP_PROP_FPS)
 fps = cap.get(cv2.CAP_PROP_FPS)
 # total_seconds = 300   # 첫 10초만 재생 || 60초 * 20분 = 1200
 
-start_seconds = 310 # 시작할 부분의 시간
-end_seconds =  340# 끝낼 부분의 시간
+start_seconds = 180 # 시작할 부분의 시간
+end_seconds =  220# 끝낼 부분의 시간
 total_seconds = end_seconds - start_seconds # 보여줄 전체 시간
 
 total_frames = int(fps * total_seconds)
@@ -30,7 +30,7 @@ total_frames = int(fps * total_seconds)
 years = np.arange(0, total_seconds, 1/fps)
 
 # 1초 단위가 아닌 프레임 단위
-data_xlse = pd.read_excel('C:/Users/user/Downloads/Face Video/Face_1W_A1_S2_central.xlsx') # C:\Users\user\Downloads\Face Video
+data_xlse = pd.read_excel('C:/Users/user/Downloads/Face Video/delta_ratio_A2.xlsx') # C:\Users\user\Downloads\Face Video
 data = data_xlse['box.center_y'] # Lip Distance Difference || Ratio_delta
 
 
