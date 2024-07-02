@@ -17,8 +17,8 @@ fps = cap.get(cv2.CAP_PROP_FPS)
 fps = cap.get(cv2.CAP_PROP_FPS)
 # total_seconds = 300   # 첫 10초만 재생 || 60초 * 20분 = 1200
 
-start_seconds = 240 # 시작할 부분의 시간
-end_seconds =  300# 끝낼 부분의 시간
+start_seconds = 310 # 시작할 부분의 시간
+end_seconds =  340# 끝낼 부분의 시간
 total_seconds = end_seconds - start_seconds # 보여줄 전체 시간
 
 total_frames = int(fps * total_seconds)
@@ -26,11 +26,12 @@ total_frames = int(fps * total_seconds)
 #years = np.arange(0, total_seconds, 1/fps) 
 
 # 특정 시간에 맞게 보여줌.
+#years = np.linspace(start_seconds, end_seconds, total_frames)
 years = np.arange(0, total_seconds, 1/fps)
 
 # 1초 단위가 아닌 프레임 단위
 data_xlse = pd.read_excel('C:/Users/user/Downloads/Face Video/Face_1W_A1_S2_central.xlsx') # C:\Users\user\Downloads\Face Video
-data = data_xlse['box.center_y']
+data = data_xlse['box.center_y'] # Lip Distance Difference || Ratio_delta
 
 
 # 특정 구간을 보여주기 위해 선언.
@@ -51,18 +52,19 @@ line, = ax.plot(years, data, lw=2)
 y_min = np.floor(data.min()) # 주어진 숫자의 소수점 이하를 버리고, 정수 부분만 남기는 함수
 y_max = np.ceil(data.max()) # 인수로 받은 숫자를 반올림하여 반환.
 '''
-y_min = 0 # 주어진 숫자의 소수점 이하를 버리고, 정수 부분만 남기는 함수
+y_min = np.floor(data.min()) # 주어진 숫자의 소수점 이하를 버리고, 정수 부분만 남기는 함수
 y_max = np.ceil(data.max()) # 인수로 받은 숫자를 반올림하여 반환.
 
 ax.set_ylim(y_min, y_max) # set_ylim의 경우, y축의 최솟값, 최댓값을 설정. 
 
 # x 축을 5초 단위로 눈금 설정
-xticks = np.arange(0, total_seconds + 1, 5)
+xticks = np.arange(0, total_seconds + 1, 1)
 ax.set_xticks(xticks)
 #ax.set_xticklabels(xticks)
 ax.set_xticklabels((xticks + start_seconds).astype(int))
 plt.xticks(rotation=45, ha='right')
 ax.set_xlim(0, total_seconds)
+# start_seconds, end_seconds)
 
 # 빨간색 수직선의 초기화
 red_line = ax.axvline(x=0, color='r') 
