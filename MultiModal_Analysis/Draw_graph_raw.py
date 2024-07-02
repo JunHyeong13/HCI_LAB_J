@@ -16,7 +16,7 @@ print(fps)
 # 전체 그래프를 그리고 싶을 때
 total_seconds = 1200
 '''
-start_seconds = 280 # 시작할 부분의 시간
+start_seconds = 240 # 시작할 부분의 시간
 end_seconds = 300 # 끝낼 부분의 시간
 total_seconds = end_seconds - start_seconds # 보여줄 전체 시간
 
@@ -46,7 +46,7 @@ y_max = np.ceil(data.max()) # 인수로 받은 숫자를 반올림하여 반환.
 ax.set_ylim(y_min, y_max) # set_ylim의 경우, y축의 최솟값, 최댓값을 설정. 
 
 # x 축을 30초 단위로 눈금 설정
-xticks = np.arange(0, total_seconds + 1, 1)
+xticks = np.arange(0, total_seconds + 1, 5)
 ax.set_xticks(xticks)
 #ax.set_xticklabels(xticks)
 ax.set_xticklabels((xticks + start_seconds).astype(int)) # 시작하는 부분의 숫자를 x 레이블에 표시.
