@@ -4,6 +4,7 @@ import numpy as np
 import time
 import csv
 
+
 mp_face_mesh = mp.solutions.face_mesh
 # 랜드 마크 감지를 위한 함수
 face_mesh = mp_face_mesh.FaceMesh(min_detection_confidence=0.5, min_tracking_confidence=0.5)
@@ -12,26 +13,22 @@ face_mesh = mp_face_mesh.FaceMesh(min_detection_confidence=0.5, min_tracking_con
 mp_drawing = mp.solutions.drawing_utils
 drawing_spec = mp_drawing.DrawingSpec(thickness=1, circle_radius=1)
 
-# C:/Users/user/Downloads/Face Video 'D:/HCI_연구실_유재환/JaeHwanYou/AR Co/Synchrony/Education/Video/Plot Code/
-video_path = 'C:/Users/user/Downloads/Face Video/A2_result/Face_1W_A2_S2.mp4'
+video_path = 'A_1W.mp4'
 cap = cv2.VideoCapture(video_path)
 
 width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)
 height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
 
 fourcc = cv2.VideoWriter_fourcc(*'DIVX')  # Specify the codec to use
-output_video = cv2.VideoWriter('C:/Users/user/Downloads/Face Video/A2_result/Face_1W_A2_S2_HeadRotation_delta.mp4', fourcc, 25.0, (int(width), int(height)))  # Filename, codec, FPS, frame size
+output_video = cv2.VideoWriter('temp.mp4', fourcc, 25.0, (int(width/2), int(height/2)))  # Filename, codec, FPS, frame size
 
 # CSV file로 값을 저장하기. 
-csv_file_path = 'C:/Users/user/Downloads/Face Video/A2_result/head_pose_coordinates_delta_A2.csv'
+csv_file_path = 'A1_1W.csv'
 frame_number = 0
-
-# Initialize previous values for delta calculation (delta값 저장하는 부분.)
-prev_x, prev_y, prev_z = None, None, None
 
 with open(csv_file_path, mode='w', newline='') as file:
     writer = csv.writer(file)
-    writer.writerow(['Frame', 'X', 'Y', 'Z', 'Delta_X', 'Delta_Y', 'Delta_Z'])  # Write the header rotation
+    writer.writerow(['Frame','PX','PY','PZ', 'RX', 'RY', 'RZ'])  # Write the header rotation
 
 
     while cap.isOpened():
@@ -41,6 +38,9 @@ with open(csv_file_path, mode='w', newline='') as file:
         
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
+        half_width = int(width/2); half_height = int(height/2)
+        image = image[half_height:,:half_width].copy()
+      
         image.flags.writeable = False
 
         results = face_mesh.process(image)
@@ -52,7 +52,7 @@ with open(csv_file_path, mode='w', newline='') as file:
         img_h, img_w, img_c = image.shape
         face_3d = []
         face_2d = []
-
+        px,py,pz,rx,ry,rz = 0,0,0,0,0,0
         if results.multi_face_landmarks:
             for face_landmarks in results.multi_face_landmarks:
                 for idx, lm in enumerate(face_landmarks.landmark):
@@ -68,6 +68,8 @@ with open(csv_file_path, mode='w', newline='') as file:
 
                         # 3D 좌표
                         face_3d.append([x, y, lm.z])
+                        if idx == 1:
+                            px,py,pz = lm.x, lm.y, lm.z
                     
                 face_2d = np.array(face_2d, dtype = np.float64)
                 face_3d = np.array(face_3d, dtype = np.float64)
@@ -88,11 +90,11 @@ with open(csv_file_path, mode='w', newline='') as file:
 
                 # get angles
                 angles, mtxR, mtxQ, Qx, Qy, Qz = cv2.RQDecomp3x3(rmat)
-
+           
                 # Get the y rotation angle
-                x = angles[0] * 360
-                y = angles[1] * 360
-                z = angles[2] * 360
+                rx = angles[0] * 360
+                ry = angles[1] * 360
+                rz = angles[2] * 360
 
                 # Display the direction (nose)
                 nose_3d_projection, jacobian = cv2.projectPoints(nose_3d, rot_vec, trans_vec, cam_matrix, dist_matrix)
@@ -103,19 +105,15 @@ with open(csv_file_path, mode='w', newline='') as file:
                 cv2.line(image, p1, p2, (255, 0, 0), 3)
 
                 # display text
-                cv2.putText(image, 'Pitch : ' + str(np.round(x, 2)), (380, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2) # 수평 축을 기준으로 얼굴을 위아래로 돌렸을 때. (가로 방향 위치)
-                cv2.putText(image, 'Yaw : ' + str(np.round(y, 2)), (380, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2) # 얼굴을 오른쪽으로 기울이면 양, 왼쪽으로 기울이면 음. (세로 방향 위치)
-                cv2.putText(image, 'Roll : ' + str(np.round(z, 2)), (380, 150), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2) # 얼굴을 오른쪽으로 돌리면 양, 왼쪽으로 돌리면 음. (깊이)
+                cv2.putText(image, 'rx: ' + str(np.round(rx, 2)), (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1)
+                cv2.putText(image, 'ry: ' + str(np.round(ry, 2)), (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1)
+                cv2.putText(image, 'rz: ' + str(np.round(rz, 2)), (50, 150), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1)
 
-                if prev_x is not None and prev_y is not None and prev_z is not None:
-                    delta_x = x - prev_x
-                    delta_y = y - prev_y
-                    delta_z = z - prev_z
-                else:
-                    delta_x, delta_y, delta_z = 0, 0, 0
+                cv2.putText(image, 'px: ' + str(np.round(px, 2)), (250, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1)
+                cv2.putText(image, 'py: ' + str(np.round(py, 2)), (250, 100), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1)
+                cv2.putText(image, 'pz: ' + str(np.round(pz, 2)), (250, 150), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1)
+
                 
-                prev_x, prev_y, prev_z = x, y, z
-                #frame_number +=1   
                 
             mp_drawing.draw_landmarks(
                 image = image,
@@ -124,13 +122,14 @@ with open(csv_file_path, mode='w', newline='') as file:
                 landmark_drawing_spec = drawing_spec,
                 connection_drawing_spec = drawing_spec
             )
-            
-        writer.writerow([frame_number, np.round(x, 2), np.round(y, 2), np.round(z, 2), np.round(delta_x, 2), np.round(delta_y, 2), np.round(delta_z, 2)])
-        frame_number +=1  
+        writer.writerow([frame_number, np.round(px, 4), np.round(py, 4), np.round(pz, 4), np.round(rx, 4), np.round(ry, 4), np.round(rz, 4)])
+        frame_number +=1   
         cv2.imshow('Head Pose Estimation', image)
+        if(frame_number %100 == 0):
+            print(frame_number)
         output_video.write(image)
         
-
+ 
         if cv2.waitKey(5) & 0xFF == 27:
             break
 

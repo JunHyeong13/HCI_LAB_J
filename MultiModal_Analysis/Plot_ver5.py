@@ -48,7 +48,6 @@ for n in range(0, 4):
     data_1 = pd.read_csv(csv_files[n])
     data_xlse.append(data_1)
 
-
 #x ,y, z
 data = []
 data_trimmed = []
@@ -72,7 +71,7 @@ for n in range(0, 4):
     ax[n].set_ylim(y_min, y_max)
 
     # x 축을 5초 단위로 눈금 설정
-    xticks = np.arange(start_seconds, end_seconds + 1, 1)
+    xticks = np.arange(start_seconds, end_seconds + 1, 2)
     ax[n].set_xticks(xticks)
     ax[n].set_xticklabels(xticks)
     plt.xticks(rotation=45, ha='right')
@@ -80,8 +79,7 @@ for n in range(0, 4):
 
 
 red_lines = [ax[n].axvline(x=0, color='r') for n in range(4)]
-
-
+#plt.subplots_adjust(bottom=0.15)
 
 plt.ion()
 plt.show()
@@ -111,9 +109,13 @@ while frame_num < frame_end:
 
     for line in red_lines:
         line.set_xdata([current_time_sec])
-    
+
+    # 현재 시간 텍스트 추가
+    time_text = f'Time: {current_time_sec:.2f} sec'
+
     # 비디오 프레임을 OpenCV로 보여주기
     for n in range(0, 4):
+        cv2.putText(all_frames[n], time_text, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
         cv2.imshow(windows[n], all_frames[n])
     
     # 플롯 업데이트
