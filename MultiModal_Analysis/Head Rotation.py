@@ -14,22 +14,25 @@ mp_drawing = mp.solutions.drawing_utils
 drawing_spec = mp_drawing.DrawingSpec(thickness=1, circle_radius=1)
 
 # C:/Users/user/Downloads/Face Video 'D:/HCI_연구실_유재환/JaeHwanYou/AR Co/Synchrony/Education/Video/Plot Code/
-video_path = 'C:/Users/user/Downloads/Face Video/Face_1W_A1_S2.mp4'
+video_path = 'C:/Users/user/Downloads/Face Video/A1_result/Face_1W_A1_S2.mp4'
 cap = cv2.VideoCapture(video_path)
 
 width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)
 height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
 
 fourcc = cv2.VideoWriter_fourcc(*'DIVX')  # Specify the codec to use
-output_video = cv2.VideoWriter('C:/Users/user/Downloads/Face Video/A2_result/Face_1W_A1_S2_HeadRotation.avi', fourcc, 25.0, (int(width), int(height)))  # Filename, codec, FPS, frame size
+output_video = cv2.VideoWriter('C:/Users/user/Downloads/Face Video/A1_result/Face_1W_A1_S2_HeadRotation_delta.mp4', fourcc, 25.0, (int(width), int(height)))  # Filename, codec, FPS, frame size
 
 # CSV file로 값을 저장하기. 
-csv_file_path = 'head_pose_coordinates_A2.csv'
+csv_file_path = 'C:/Users/user/Downloads/Face Video/A1_result/head_pose_coordinates_delta_A1.csv'
 frame_number = 0
+
+# Initialize previous values for delta calculation (delta값 저장하는 부분.)
+prev_x, prev_y, prev_z = None, None, None
 
 with open(csv_file_path, mode='w', newline='') as file:
     writer = csv.writer(file)
-    writer.writerow(['Frame', 'X', 'Y', 'Z'])  # Write the header rotation
+    writer.writerow(['Frame', 'X', 'Y', 'Z', 'Delta_X', 'Delta_Y', 'Delta_Z'])  # Write the header rotation
 
 
     while cap.isOpened():
@@ -101,11 +104,20 @@ with open(csv_file_path, mode='w', newline='') as file:
                 cv2.line(image, p1, p2, (255, 0, 0), 3)
 
                 # display text
-                cv2.putText(image, 'x: ' + str(np.round(x, 2)), (500, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
-                cv2.putText(image, 'y: ' + str(np.round(y, 2)), (500, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
-                cv2.putText(image, 'z: ' + str(np.round(z, 2)), (500, 150), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+                cv2.putText(image, 'Pitch : ' + str(np.round(x, 2)), (400, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2) # 수평 축을 기준으로 얼굴을 위아래로 돌렸을 때. (가로 방향 위치)
+                cv2.putText(image, 'Yaw : ' + str(np.round(y, 2)), (400, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2) # 얼굴을 오른쪽으로 기울이면 양, 왼쪽으로 기울이면 음. (세로 방향 위치)
+                cv2.putText(image, 'Roll : ' + str(np.round(z, 2)), (400, 150), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2) # 얼굴을 오른쪽으로 돌리면 양, 왼쪽으로 돌리면 음. (깊이)
 
-                writer.writerow([frame_number, np.round(x, 2), np.round(y, 2), np.round(z, 2)])
+                if prev_x is not None and prev_y is not None and prev_z is not None:
+                    delta_x = x - prev_x
+                    delta_y = y - prev_y
+                    delta_z = z - prev_z
+                else:
+                    delta_x, delta_y, delta_z = 0, 0, 0
+                
+                
+                writer.writerow([frame_number, np.round(x, 2), np.round(y, 2), np.round(z, 2), np.round(delta_x, 2), np.round(delta_y, 2), np.round(delta_z, 2)])
+                prev_x, prev_y, prev_z = x, y, z
                 frame_number +=1   
                 
             mp_drawing.draw_landmarks(

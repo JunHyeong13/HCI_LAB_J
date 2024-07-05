@@ -141,8 +141,8 @@ while cap.isOpened():
             '''
             
         mesh_points = np.array([np.multiply([p.x, p.y], [img_w, img_h]).astype(int) for p in results.multi_face_landmarks[0].landmark])
-        (l_cx, l_cy), l_radius = cv2.minEnclosingCircle(mesh_points[LEFT_IRIS])
-        (r_cx, r_cy), r_radius = cv2.minEnclosingCircle(mesh_points[RIGHT_IRIS])
+        (l_cx, l_cy), l_radius = cv2.minEnclosingCircle(mesh_points[LEFT_IRIS]) # LEFT_IRIS = [474, 475, 476, 477]
+        (r_cx, r_cy), r_radius = cv2.minEnclosingCircle(mesh_points[RIGHT_IRIS]) # RIGHT_IRIS = [469, 470, 471, 472]  
 
         center_left = np.array([l_cx, l_cy], dtype=np.int32)
         center_right = np.array([r_cx, r_cy], dtype=np.int32)
@@ -151,7 +151,7 @@ while cap.isOpened():
         cv2.circle(image, center_right, int(r_radius), (255, 0, 255), 1, cv2.LINE_AA)
 
         ratio = iris_position(
-                center_right, mesh_points[R_H_RIGHT], mesh_points[R_H_LEFT][0]
+                center_right, mesh_points[R_H_RIGHT], mesh_points[R_H_LEFT][0] # R_H_RIGHT = [133]  # R_H_LEFT = [33] 
                 )
 
         if prev_ratio is not None:
