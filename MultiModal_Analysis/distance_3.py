@@ -9,7 +9,8 @@ mp_draw = mp.solutions.drawing_utils
 mp_drawing_styles = mp.solutions.drawing_styles
 
 # 웹캠 캡처 객체 초기화
-cap = cv2.VideoCapture('C:/Users/user/Downloads/Face Video/A4_result/Face_1W_A4_S2.mp4')
+cap = cv2.VideoCapture('C:/Users/user/Downloads/Face Video/A1_result/Face_1W_A1_S2.mp4')
+print("current video info : ",cap)
 face_mesh = mp_face_mesh.FaceMesh(min_detection_confidence=0.5, min_tracking_confidence=0.5, refine_landmarks = True)
 
 width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)
@@ -17,10 +18,10 @@ height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
 fps = cap.get(cv2.CAP_PROP_FPS)
 
 fourcc = cv2.VideoWriter_fourcc(*'DIVX')  # Specify the codec to use
-output_video = cv2.VideoWriter('C:/Users/user/Downloads/Face Video/A4_result/Distance_A4.mp4', fourcc, 25.0, (int(width), int(height)))  # Filename, codec, FPS, frame size
+output_video = cv2.VideoWriter('C:/Users/user/Downloads/Face Video/A1_result/distance_A1.mp4', fourcc, 25.0, (int(width), int(height)))  # Filename, codec, FPS, frame size
 
 # CSV 파일 초기화
-csv_file = 'C:/Users/user/Downloads/Face Video/A4_result/distance_values_A4.csv'
+csv_file = 'C:/Users/user/Downloads/Face Video/A1_result/Distance_values_A1.csv'
 with open(csv_file, mode='w', newline='') as file:
     writer = csv.writer(file)
     writer.writerow(['Frame', 'Distance_cm'])  # 헤더 작성
@@ -34,6 +35,7 @@ frame_count = 0
 
 while cap.isOpened():
     ret, frame = cap.read()
+    print("video open : ", ret, frame)
     if not ret:
         break
 
@@ -73,21 +75,23 @@ while cap.isOpened():
     # Draw the calculated distance on the frame
     cv2.putText(
         frame,
-        f"distance : {dZ:.2f} cm",
-        (int(width * 0.1), height-10),
+        f"distance : {dZ:.2f}",
+        (10, 50), # 0 , height-40 => 아래쪽 위치
+        cv2.FONT_HERSHEY_SIMPLEX,
+        1,
         (0, 0, 255),
         2,
     )
     
-    cv2.putText(
-        frame,
-        f"Time: {current_time_sec:.2f} sec",
-        (10, 50),
-        cv2.FONT_HERSHEY_SIMPLEX,
-        1,
-        (255, 0, 0),
-        2,
-    )
+    # cv2.putText(
+    #     frame,
+    #     f"Time: {current_time_sec:.2f} sec",
+    #     (10, 50),
+    #     cv2.FONT_HERSHEY_SIMPLEX,
+    #     1,
+    #     (255, 0, 0),
+    #     2,
+    # )
     
     # Save distance to CSV
     with open(csv_file, mode='a', newline='') as file:
@@ -96,5 +100,10 @@ while cap.isOpened():
 
     cv2.imshow("MediaPipe Face Mesh", frame)
     output_video.write(frame)
+    
+    frame_count+=1
+    
+    if cv2.waitKey(5) & 0xFF == 27:
+        break
 output_video.release()
 cv2.destroyAllWindows()

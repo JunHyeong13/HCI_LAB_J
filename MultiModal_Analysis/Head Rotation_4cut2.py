@@ -13,17 +13,17 @@ face_mesh = mp_face_mesh.FaceMesh(min_detection_confidence=0.5, min_tracking_con
 mp_drawing = mp.solutions.drawing_utils
 drawing_spec = mp_drawing.DrawingSpec(thickness=1, circle_radius=1)
 
-video_path = 'A_1W.mp4'
+video_path = 'C:/Users/user/Downloads/Face Video/A_1W.mp4'
 cap = cv2.VideoCapture(video_path)
 
 width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)
 height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
 
 fourcc = cv2.VideoWriter_fourcc(*'DIVX')  # Specify the codec to use
-output_video = cv2.VideoWriter('temp.mp4', fourcc, 25.0, (int(width/2), int(height/2)))  # Filename, codec, FPS, frame size
+output_video = cv2.VideoWriter('C:/Users/user/Downloads/Face Video/Four_A/temp.mp4', fourcc, 25.0, (int(width/2), int(height/2)))  # Filename, codec, FPS, frame size
 
 # CSV file로 값을 저장하기. 
-csv_file_path = 'A1_1W.csv'
+csv_file_path = 'C:/Users/user/Downloads/Face Video/Four_A/A1_1W.csv'
 frame_number = 0
 
 with open(csv_file_path, mode='w', newline='') as file:
@@ -38,8 +38,8 @@ with open(csv_file_path, mode='w', newline='') as file:
         
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
-        half_width = int(width/2); half_height = int(height/2)
-        image = image[half_height:,:half_width].copy()
+        #half_width = int(width/2); half_height = int(height/2)
+        #image = image[half_height:,:half_width].copy()
       
         image.flags.writeable = False
 

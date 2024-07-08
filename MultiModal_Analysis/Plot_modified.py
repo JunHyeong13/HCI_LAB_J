@@ -22,7 +22,7 @@ csv_files = [
 
 
 '''
-# 끄덕임을 보는 코드 구간. 
+# 끄덕을 보는 코드 구간. 
 videos = [
     'C:/Users/user/Downloads/Face Video/A1_result/Face_1W_A1_S2_HeadRotation_delta.mp4',
     'C:/Users/user/Downloads/Face Video/A2_result/Face_1W_A2_S2_HeadRotation_delta.mp4',
@@ -56,8 +56,13 @@ fps = cap.get(cv2.CAP_PROP_FPS)
 
 # 비디오 프레임 수 가져오기
 fps = cap[0].get(cv2.CAP_PROP_FPS)
+
+# 원래 시간 때를 정의. 
 start_seconds = 180 # 6분
-end_seconds =  210# 3분 25초 
+end_seconds = 230# 3분 25초 
+
+
+# 보여주고 싶은 시간 때를 정의 
 total_frames = int(fps * (start_seconds - end_seconds))
 
 # 나중에 자동화
@@ -76,34 +81,51 @@ fig, ax = plt.subplots(4, 1, figsize=(10, 15))
 
 for n in range(0, 4):
     data.append(data_xlse[n]['Distance_cm'])
+    
+    # 현재 코드는 시작할 프레임과 나중에 보여줄 프레임 정보를 선언한 부분.
     start_frame = int(start_seconds * fps)
     end_frame = int(end_seconds * fps)
+
+    #print(end_frame)
     data_trimmed.append(data[n][start_frame:end_frame])
-    print(data_trimmed[n])
     line, = ax[n].plot(np.arange(start_frame, end_frame), data_trimmed[n], lw=2)
 
 for n in range(0, 4):
     y_min = np.floor(10.0)
-    y_max = np.ceil(60.0)
+    y_max = np.ceil(70.0)
     ax[n].set_ylim(y_min, y_max)
 
     # x 축 설정
-    xticks = np.arange(start_seconds, end_seconds + 1, 1)  # 5초 간격으로 눈금 설정
-    xtick_positions = np.arange(start_frame, end_frame + 1, int(fps))  # 6개의 위치 눈금 (end_frame - start_frame) // 6
+    xticks = np.arange(start_seconds, end_seconds + 1, 2)  # 5초 간격으로 눈금 설정
+    xtick_positions = np.arange(start_frame, end_frame + 1, int(fps)*2)  # 6개의 위치 눈금 (end_frame - start_frame) // 6
     ax[n].set_xticks(xtick_positions)
-    ax[n].set_xticklabels(xticks)
-    plt.setp(ax[n].get_xticklabels(), rotation=45, ha='right')
-    ax[n].set_xlim(start_frame, end_frame)
+    
+    def format_time_label(start_seconds, offset):
+        total_seconds = start_seconds + offset
+        initial_minutes = 21
+        initial_seconds = 23
+        total_seconds += initial_seconds
+        minutes = initial_minutes + (total_seconds // 60)
+        seconds = total_seconds % 60
+        return f'{minutes}:{seconds:02d}'
 
+    xtick_labels = [format_time_label(start_seconds, i * 2) for i in range(len(xticks))]
+    
+    # def format_time_label(total_seconds):
+    #     minutes = 21 + (total_seconds // 60)
+    #     seconds = 30 + (total_seconds % 60)
+    #     return f'{minutes}:{seconds:02d}'
+
+    # xtick_labels = [format_time_label(start_seconds + i * 5) for i in range(len(xticks))]
+    
+    ax[n].set_xticklabels(xtick_labels)
+    plt.setp(ax[n].get_xticklabels(),rotation=45, ha='right') #,rotation=45, ha='right'
+    ax[n].set_xlim(start_frame, end_frame)
+    
 plt.draw()
 plt.pause(0.001)
 
-# 끄덕임이 있는 시간 때에 선을 그리기
-# red_lines_246 = [ax[n].axvline(x=start_frame + 246 - start_seconds * fps, color='b', linestyle='--') for n in range(4)]
-# red_lines_247 = [ax[n].axvline(x=start_frame + 247 - start_seconds * fps, color='b', linestyle='--') for n in range(4)]
-
 red_lines = [ax[n].axvline(x=0, color='r') for n in range(4)]
-
 
 plt.ion()
 plt.show()
