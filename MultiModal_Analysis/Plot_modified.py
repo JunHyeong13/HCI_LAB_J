@@ -58,8 +58,8 @@ fps = cap.get(cv2.CAP_PROP_FPS)
 fps = cap[0].get(cv2.CAP_PROP_FPS)
 
 # 원래 시간 때를 정의. 
-start_seconds = 180 # 6분
-end_seconds = 230# 3분 25초 
+start_seconds = 570 # 1분 ## 281 (4분 41초 ~ )
+end_seconds =  590 # 1분 30초 
 
 
 # 보여주고 싶은 시간 때를 정의 
@@ -100,13 +100,25 @@ for n in range(0, 4):
     xtick_positions = np.arange(start_frame, end_frame + 1, int(fps)*2)  # 6개의 위치 눈금 (end_frame - start_frame) // 6
     ax[n].set_xticks(xtick_positions)
     
+    # def format_time_label(start_seconds, offset):
+    #     total_seconds = start_seconds + offset
+    #     initial_minutes = 22
+    #     initial_seconds = 4
+    #     total_seconds += initial_seconds
+    #     minutes = initial_minutes + (total_seconds // 60)
+    #     seconds = total_seconds % 60
+    #     return f'{minutes}:{seconds:02d}'
+    
+    
     def format_time_label(start_seconds, offset):
-        total_seconds = start_seconds + offset
-        initial_minutes = 21
-        initial_seconds = 23
-        total_seconds += initial_seconds
+        initial_minutes = 30
+        initial_seconds = 53
+        total_seconds = initial_seconds + (offset)
+        
         minutes = initial_minutes + (total_seconds // 60)
+        #minutes = initial_minutes + ((initial_seconds + (offset * 2)) // 60)
         seconds = total_seconds % 60
+    
         return f'{minutes}:{seconds:02d}'
 
     xtick_labels = [format_time_label(start_seconds, i * 2) for i in range(len(xticks))]
