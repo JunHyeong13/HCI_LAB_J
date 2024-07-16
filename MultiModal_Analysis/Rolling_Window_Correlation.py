@@ -26,14 +26,13 @@ def zscore_signal(signal):
     
     return signal_normalized
 
-group_name = ['G']
+group_name = ['A']
 weeks = ['1W', '2W', '3W', '4W']
 section_num = ['S1', 'S2']
 
 # Load data from CSV files
-total_path = 'D:/HCI_연구실_유재환/JaeHwanYou/AR Co/Synchrony/Education/Video/Plot Code/test/4명 영상 Test/Data/total_synchrony.csv'
+total_path = 'D:/MultiModal/MultiModal_Model/results/face/face_synchrony/total_synchrony.csv'
 total_synchrony = pd.DataFrame()
-
 
 for group in tqdm(group_name, desc = "Groups"): # desc: 진행 바 앞에 문자열을 출력하기 위해 쓰는 키워드 
     for week in tqdm(weeks, desc=f"Weeks for group {group}"):
