@@ -141,6 +141,12 @@ def saveFile(video_path, output_path, excel_path) :
                     data_x.append(x)
                     data_y.append(y)
                     data_z.append(z)
+                    
+                    ## 변화량 값을 저장하는 부분. => 이를 절대값으로 저장하여 보기 위해서는 abs()를 사용해주어야 함. 
+                    # data_delta_x.append(abs(x- data_x[frame-1]))
+                    # data_delta_y.append(abs(y- data_y[frame-1]))
+                    # data_delta_z.append(abs(z- data_z[frame-1]))
+                    
                     data_delta_x.append((x- data_x[frame-1]))
                     data_delta_y.append((y- data_y[frame-1]))
                     data_delta_z.append((z- data_z[frame-1]))
@@ -202,9 +208,9 @@ def saveFile(video_path, output_path, excel_path) :
     csv_data.to_csv(excel_path, index=False)
 
 
-group_name = ['B']
-weeks = ['1W'] # , '2W', '3W', '4W'
-participants_num = ['2','3','4'] # , '2', '3', '4'
+group_name = ['B','C','D','E','F','G']
+weeks = ['2W','3W','4W'] # , '2W', '3W', '4W'
+participants_num = ['1','2','3','4'] # , '2', '3', '4'
 section_num = ['S1'] # , 'S2'
 
 
@@ -213,11 +219,11 @@ for group in group_name :
         for participant in participants_num:
             for section in section_num: 
                 video_path = f'D:/MultiModal/Data/Data_PreProcessing/Face/{group}_group/Face_{week}_{group}{participant}_{section}.mp4'
-                print(video_path)
+                #print(video_path)
                 output_path = f'D:/MultiModal/Data/Data_PreProcessing/Head_Rotation_Mouse/video/Face_{week}_{group}{participant}_{section}.mp4'
-                print(output_path)
+                #print(output_path)
                 excel_path = f'D:/MultiModal/Data/Data_PreProcessing/Head_Rotation_Mouse/{group}_group/Face_{week}_{group}{participant}_{section}.csv'
-                print(excel_path)
+                #print(excel_path)
                 saveFile(video_path, output_path, excel_path)
 
 '''
