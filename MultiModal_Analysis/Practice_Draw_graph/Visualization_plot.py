@@ -26,7 +26,7 @@ def zscore_signal(signal):
         signal_normalized = (signal - signal_mean) / signal_std
     return signal_normalized
 
-# 성과 총점 읽어오기
+# 성과 평균 점수를 기록한 부분의 column 읽어오기
 performance_file = 'C:/Users/user/Desktop/Group_performance.xlsx'  # 성과 총점이 기록된 엑셀 파일 경로
 performance_df = pd.read_excel(performance_file)
 performance_scores = performance_df['A']  # 그룹 별 성과 총점이 기록된 열 이름
