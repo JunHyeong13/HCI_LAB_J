@@ -38,7 +38,7 @@ for group in groups:
                         read_test = pd.read_csv(file_path)
                         
                         # 해당 그룹의 X 컬럼의 평균 값 읽기 및 저장
-                        x_mean = np.mean(read_test['X'])
+                        x_mean = np.mean(read_test['Delta_X']) # X, Delta_X(=절대값 아닌 것), Delta_X(=절대값 인것)
                         group_means[group].append(x_mean)
 
 # 각 그룹별 평균 계산
@@ -47,7 +47,7 @@ for group in groups:
 
 # 상관관계 계산을 위한 데이터프레임 생성
 df_means = pd.DataFrame(group_means, index=[0]).T
-df_means.columns = ['X_Mean'] # D 그룹과 F그룹에서 NaN 값이 있음. 
+df_means.columns = ['delta_X_Mean'] # D 그룹과 F그룹에서 NaN 값이 있음. 
 
 # 성과 점수와 그룹 평균을 하나의 데이터프레임으로 결합
 df_combined = pd.concat([df_means, performance_scores.rename('Performance_Score')], axis=1)
@@ -57,19 +57,35 @@ df_combined = df_combined.dropna()
 #print(df_combined)
 
 # 상관관계 및 p-value 계산
-correlation, p_value = pearsonr(df_combined['X_Mean'], df_combined['Performance_Score'])
+correlation, p_value = pearsonr(df_combined['delta_X_Mean'], df_combined['Performance_Score'])
 
 print(f"Correlation: {correlation}") # -0.22011039
 print(f"P-value:  {p_value}") # 0.7220264 || p-value 해석 => p_value 값이 작을수록 유의미한 결과가 있다고 볼 수 있음.
+
+
+'''
+X(=Pitch 축) 
+Correlation : -0.22
+P-value : 0.722
+
+Delta_X(=Pitch 축)
+Correlation : -0.823
+P-value : 0.086
+
+Delta_X(=Pitch 축) abs
+Correlation :
+P-value :
+
+'''
 
 # 산점도 시각화
 plt.figure(figsize=(10, 6))
 
 for group in df_combined.index:
-    plt.scatter(df_combined.loc[group, 'X_Mean'], df_combined.loc[group, 'Performance_Score'], label=f'Group {group}')
+    plt.scatter(df_combined.loc[group, 'delta_X_Mean'], df_combined.loc[group, 'Performance_Score'], label=f'Group {group}')
 
 plt.xlabel('X Mean')
 plt.ylabel('Performance Score')
-plt.title(f'Scatter Plot between Group Performance Scores and X Means\nCorrelation: {correlation:.2f}, P-value: {p_value:.2e}')
+plt.title(f'Scatter Plot between Group Performance Scores and delta_X Means\nCorrelation: {correlation:.2f}, P-value: {p_value:.2e}')
 plt.legend()
 plt.show()
