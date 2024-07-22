@@ -208,7 +208,7 @@ def saveFile(video_path, output_path, excel_path) :
     csv_data.to_csv(excel_path, index=False)
 
 
-group_name = ['A','B','C','D','E','F','G']
+group_name = ['E','F','G'] #,'E','F','G'
 weeks = ['1W','2W','3W','4W'] # , '2W', '3W', '4W'
 participants_num = ['1','2','3','4'] # , '2', '3', '4'
 section_num = ['S1','S2'] # , 'S2'

@@ -1,91 +1,162 @@
-import numpy as np
-import matplotlib.pyplot as plt
-import pandas as pd
+'''
+# import os
+# import pandas as pd
+# import numpy as np
+
+# # 경로에 존재하는 파일 읽어오기. 
+# Weeks = ['1W', '2W', '3W', '4W']
+# Steps = ['S1', 'S2']
+# groups = ['A', 'B', 'C', 'D', 'E', 'F', 'G']
+
+# path = 'D:/MultiModal/Data/Data_PreProcessing/Head_Rotation_Mouse/'
+
+# 그룹 별 평균 값을 저장하기 위한 딕셔너리 선언 
+# group_means = {group: {week: [] for week in Weeks} for group in groups}
+
+# for group in groups:
+#     for week in Weeks:
+#         for i in ['1', '2', '3', '4']:
+#             for step in Steps:
+#                 # Set the directory path
+#                 directory_path = os.path.join(path, f'{group}_group/')
+                
+#                 # Get the list of files in the directory
+#                 if os.path.exists(directory_path):
+#                     file_list = os.listdir(directory_path)
+                    
+#                     for file_name in file_list:
+#                         # Check if the file name contains the specific week, group, and step
+#                         if f'Face_{week}_{group}{i}_{step}' in file_name:
+#                             # Set the file path
+#                             file_path = os.path.join(directory_path, file_name)
+                        
+#                             read_test = pd.read_csv(file_path)
+                            
+#                             # Calculate the mean of the 'Delta_X' column
+#                             x_mean = np.mean(read_test['Delta_X'])
+#                             #print(x_mean)
+                            
+#                             # Append the mean to the corresponding group and week
+#                             group_means[group][week].append(x_mean)
+
+# NaN 값이 있을 시, 평균 값이 계산되지 않으므로, nan 부분이 있다면 넘어갈 수 있도록 세팅.
+# weekly_means = {group: {week: np.nanmean(values) if len(values) > 0 else np.nan for week, values in group_means[group].items()} for group in groups}
+
+# weekly_means_df = pd.DataFrame(weekly_means).T
+# output_path = 'D:/MultiModal/Data/Data_PreProcessing/Head_Rotation_Mouse/group_weekly_means.xlsx'
+# weekly_means_df.to_excel(output_path)
+# print(weekly_means_df)
+
+'''
+
+
+## 상관분석 및 산점도 그래프 시각화 하는 부분.
 import os
-from scipy.stats import pearsonr
+import numpy as np 
+import pandas as pd
+import matplotlib.pyplot as plt
 
-# 성과 평균 점수를 기록한 부분의 column 읽어오기
-performance_file = 'C:/Users/user/Desktop/Group_performance.xlsx'  # 성과 총점이 기록된 엑셀 파일 경로
-performance_df = pd.read_excel(performance_file)
-performance_scores = performance_df.loc[0]  # 첫 번째 행의 값을 성과 점수로 설정
+performance_data_path = 'C:/Users/user/Desktop/Group_performance.xlsx' 
+deltaX_data_path = 'D:/MultiModal/Data/Data_PreProcessing/Head_Rotation_Mouse/group_weekly_means.xlsx' 
 
-# CSV 파일 목록
-Weeks = ['1W','2W','3W','4W']
-Steps = ['S1','S2']
-groups = ['A','B','C','D','E','F','G']
+# save the plots
+save_path = 'D:/MultiModal/MultiModal_Model/Head_Rotation_Mouse/Graph_delta_abs/'
 
-path = f'D:/MultiModal/Data/Data_PreProcessing/Head_Rotation_Mouse/'
+performance_data = pd.read_excel(performance_data_path)
+deltaX_data = pd.read_excel(deltaX_data_path)
 
-group_means = {group: [] for group in groups}
+# Calculate the 'TOTAL' for deltaX data by summing across the weeks
+deltaX_data['TOTAL'] = deltaX_data.iloc[:, 1:5].sum(axis=1)
 
-for group in groups:
-    for week in Weeks:
-        for i in ['1','2','3','4']:
-            for step in Steps:
-                # 디렉토리 경로 설정
-                directory_path = os.path.join(path, f'{group}_group/')
-                
-                # 디렉토리에서 파일 목록 가져오기
-                file_list = os.listdir(directory_path)
-                
-                for file_name in file_list:
-                    # 파일 이름에 특정 주, 그룹, 단계가 포함되어 있는지 확인
-                    if f'Face_{week}_{group}{i}_{step}' in file_name:
-                        # 파일 경로 설정
-                        file_path = os.path.join(directory_path, file_name)
-                        
-                        # CSV 파일 읽기
-                        read_test = pd.read_csv(file_path)
-                        
-                        # 해당 그룹의 X 컬럼의 평균 값 읽기 및 저장
-                        x_mean = np.mean(read_test['Delta_X']) # X, Delta_X(=절대값 아닌 것), Delta_X(=절대값 인것)
-                        group_means[group].append(x_mean)
+# Rename columns for consistency
+performance_data.columns = ['Group', '1W', '2W', '3W', '4W', 'TOTAL']
+deltaX_data.columns = ['Group', '1W', '2W', '3W', '4W', 'TOTAL']
 
-# 각 그룹별 평균 계산
-for group in groups:
-    group_means[group] = np.mean(group_means[group])
+# Merge the two datasets on 'Group'
+merged_data = pd.merge(performance_data, deltaX_data, on='Group', suffixes=('_score', '_deltaX'))
 
-# 상관관계 계산을 위한 데이터프레임 생성
-df_means = pd.DataFrame(group_means, index=[0]).T
-df_means.columns = ['delta_X_Mean'] # D 그룹과 F그룹에서 NaN 값이 있음. 
+# Calculate Pearson correlation coefficients
+correlation_results = {}
+columns = ['1W', '2W', '3W', '4W', 'TOTAL']
+for col in columns:
+    correlation = merged_data[f'{col}_score'].corr(merged_data[f'{col}_deltaX'])
+    correlation_results[col] = correlation
 
-# 성과 점수와 그룹 평균을 하나의 데이터프레임으로 결합
-df_combined = pd.concat([df_means, performance_scores.rename('Performance_Score')], axis=1)
+# Convert the results to a DataFrame for better display
+correlation_df = pd.DataFrame(list(correlation_results.items()), columns=['Week', 'Correlation'])
 
-# 만약 NaN값이 있다면, 그 행은 건너 뛰고 상관관계 분석을 진행할 수 있도록 함. 
-df_combined = df_combined.dropna()
-#print(df_combined)
+# Display the correlation results
+print(correlation_df)
 
-# 상관관계 및 p-value 계산
-correlation, p_value = pearsonr(df_combined['delta_X_Mean'], df_combined['Performance_Score'])
+# Define a color map for the groups
+colors = ['blue', 'orange', 'green', 'red', 'purple', 'brown', 'pink']
+group_colors = {group: color for group, color in zip(merged_data['Group'].unique(), colors)}
 
-print(f"Correlation: {correlation}") # -0.22011039
-print(f"P-value:  {p_value}") # 0.7220264 || p-value 해석 => p_value 값이 작을수록 유의미한 결과가 있다고 볼 수 있음.
-
-
-'''
-X(=Pitch 축) 
-Correlation : -0.22
-P-value : 0.722
-
-Delta_X(=Pitch 축)
-Correlation : -0.823
-P-value : 0.086
-
-Delta_X(=Pitch 축) abs
-Correlation :
-P-value :
-
-'''
-
-# 산점도 시각화
+# Create a bar plot for the correlation results
 plt.figure(figsize=(10, 6))
+plt.bar(correlation_df['Week'], correlation_df['Correlation'], color='skyblue')
+plt.xlabel('Week')
+plt.ylabel('Pearson Correlation Coefficient')
+plt.title('Correlation between Performance Scores and DeltaX by Week')
+plt.ylim(-1, 1)
+plt.axhline(0, color='gray', linestyle='--')
+plt.savefig(os.path.join(save_path, 'correlation_bar_plot.png')) 
+#plt.show()
+plt.close()
 
-for group in df_combined.index:
-    plt.scatter(df_combined.loc[group, 'delta_X_Mean'], df_combined.loc[group, 'Performance_Score'], label=f'Group {group}')
+# 산점도 그래프 그려보는 구간. (각 주차별 및 전체)
+fig, axes = plt.subplots(3, 2, figsize=(15, 15))
+weeks = ['1W', '2W', '3W', '4W', 'TOTAL']
+axes = axes.flatten()
 
-plt.xlabel('X Mean')
-plt.ylabel('Performance Score')
-plt.title(f'Scatter Plot between Group Performance Scores and delta_X Means\nCorrelation: {correlation:.2f}, P-value: {p_value:.2e}')
-plt.legend()
-plt.show()
+for i, week in enumerate(weeks):
+    ax = axes[i]
+    for group in merged_data['Group'].unique():
+        group_data = merged_data[merged_data['Group'] == group]
+        ax.scatter(group_data[f'{week}_deltaX'], group_data[f'{week}_score'], 
+                   color=group_colors[group], label=group, alpha=0.6)
+        
+        
+    # 회귀선 추가하는 부분. 
+    x = merged_data[f'{week}_deltaX']
+    y = merged_data[f'{week}_score']
+    m, b = np.polyfit(x, y, 1)  # Fit a line to the data
+    ax.plot(x, m*x + b, color='red', linestyle='--')
+        
+    ax.set_xlabel('DeltaX')
+    ax.set_ylabel('Performance Score')
+    ax.set_title(f'{week} Correlation: {correlation_results[week]:.2f}')
+    ax.axhline(0, color='gray', linestyle='--')
+    ax.axvline(0, color='gray', linestyle='--')
+    ax.legend()
+
+# Adjust layout
+plt.tight_layout()
+plt.savefig(os.path.join(save_path,'correlation_scatter_plots_with_regression_lines.png'))  # Save the scatter plots as a PNG file
+#plt.show()
+plt.close()
+
+
+'''
+
+# 그룹 별 어디에 분포되어 있는지 annotate 한 부분. 
+# for i, week in enumerate(weeks):
+#     ax = axes[i]
+#     ax.scatter(merged_data[f'{week}_deltaX'], merged_data[f'{week}_score'], color='blue', alpha=0.6)
+#     ax.set_xlabel('DeltaX')
+#     ax.set_ylabel('Performance Score')
+#     ax.set_title(f'{week} Correlation: {correlation_results[week]:.2f}')
+#     ax.axhline(0, color='gray', linestyle='--')
+#     ax.axvline(0, color='gray', linestyle='--')
+    
+#     # Annotate each point with the group label
+#     for idx, row in merged_data.iterrows():
+#         ax.annotate(row['Group'], (row[f'{week}_deltaX'], row[f'{week}_score']), fontsize=15, alpha=0.7)
+
+# # Adjust layout
+# plt.tight_layout()
+# plt.savefig(os.path.join(save_path,'correlation_scatter_plots.png'))  # Save the scatter plots as a PNG file
+# #plt.show()
+# plt.close()
+
+'''
