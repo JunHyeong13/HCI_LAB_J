@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from scipy.signal import butter, filtfilt
 import os
+from tqdm import tqdm
 
 def directional_agreement(signal1, signal2):
     # Normalize the signals
@@ -60,7 +61,7 @@ def rolling_window_correlation(signal1, signal2, window_size):
     num_samples = len(signal1)
     correlations = []
 
-    for i in range(num_samples - window_size + 1):
+    for i in tqdm(range(num_samples - window_size + 1), desc="Calculating Rolling Window Correlation"):
         window1 = signal1[i : i + window_size]
         window2 = signal2[i : i + window_size]
         
@@ -89,10 +90,10 @@ def zscore_signal(signal):
     # Avoid division by zero
     if signal_std == 0:
         signal_normalized = np.zeros_like(signal)
-        print(signal_normalized)
+        #print(signal_normalized)
     else:
         signal_normalized = (signal - signal_mean) / signal_std
-        print(signal_normalized)
+        #print(signal_normalized)
     
     # # Subtract the mean and divide by the standard deviation
     # signal_normalized = (signal - signal_mean) / signal_std
@@ -102,10 +103,10 @@ def zscore_signal(signal):
 
 # Load data from CSV files || 입력받으려는 데이터의 경우, Head Rotation 의 (x,y,z 값과 각 축의 변화량 값, lip_distance 값)이 있는 것. 
 csv_files = [
-    f'D:/MultiModal/Data/Data_PreProcessing/Head_Rotation_Mouse/B_group/Face_2W_A1_S1.csv',
-    f'D:/MultiModal/Data/Data_PreProcessing/Head_Rotation_Mouse/B_group/Face_2W_A2_S1.csv',
-    f'D:/MultiModal/Data/Data_PreProcessing/Head_Rotation_Mouse/B_group/Face_2W_A3_S1.csv',
-    f'D:/MultiModal/Data/Data_PreProcessing/Head_Rotation_Mouse/B_group/Face_2W_A4_S1.csv',
+    f'D:/MultiModal/Data/Data_PreProcessing/Head_Rotation_Mouse/E_group/Face_1W_E1_S2.csv',
+    f'D:/MultiModal/Data/Data_PreProcessing/Head_Rotation_Mouse/E_group/Face_1W_E2_S2.csv',
+    f'D:/MultiModal/Data/Data_PreProcessing/Head_Rotation_Mouse/E_group/Face_1W_E3_S2.csv',
+    f'D:/MultiModal/Data/Data_PreProcessing/Head_Rotation_Mouse/E_group/Face_1W_E4_S2.csv',
 ]
 
 data_xlse = []
@@ -225,7 +226,7 @@ if valid_files:
 
     plt.tight_layout()
     #plt.show()
-    img_path = 'D:/MultiModal/MultiModal_Model/Head_Rotation_Mouse/PC and RC plot/'
-    plt.savefig(img_path + 'B_group_PC and RC_2W_S1.png')
+    img_path = 'D:/MultiModal/MultiModal_Model/Head_Rotation_Mouse/PC and RC plot/E/'
+    plt.savefig(img_path + 'E_group_PC and RC_1W_S2.png')
 else:
     print("Vaild data files not found. Processing skipped")
