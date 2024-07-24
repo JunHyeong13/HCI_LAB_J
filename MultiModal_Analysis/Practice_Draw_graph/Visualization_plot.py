@@ -10,7 +10,7 @@
 
 # path = 'D:/MultiModal/Data/Data_PreProcessing/Head_Rotation_Mouse/'
 
-# 그룹 별 평균 값을 저장하기 위한 딕셔너리 선언 
+# #그룹 별 평균 값을 저장하기 위한 딕셔너리 선언 
 # group_means = {group: {week: [] for week in Weeks} for group in groups}
 
 # for group in groups:
@@ -39,7 +39,7 @@
 #                             # Append the mean to the corresponding group and week
 #                             group_means[group][week].append(x_mean)
 
-# NaN 값이 있을 시, 평균 값이 계산되지 않으므로, nan 부분이 있다면 넘어갈 수 있도록 세팅.
+# #NaN 값이 있을 시, 평균 값이 계산되지 않으므로, nan 부분이 있다면 넘어갈 수 있도록 세팅.
 # weekly_means = {group: {week: np.nanmean(values) if len(values) > 0 else np.nan for week, values in group_means[group].items()} for group in groups}
 
 # weekly_means_df = pd.DataFrame(weekly_means).T
@@ -49,8 +49,7 @@
 
 '''
 
-
-## 상관분석 및 산점도 그래프 시각화 하는 부분.
+# 상관분석 및 산점도 그래프 시각화 하는 부분.
 import os
 import numpy as np 
 import pandas as pd

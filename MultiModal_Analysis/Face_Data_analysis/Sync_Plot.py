@@ -103,10 +103,10 @@ def zscore_signal(signal):
 
 # Load data from CSV files || 입력받으려는 데이터의 경우, Head Rotation 의 (x,y,z 값과 각 축의 변화량 값, lip_distance 값)이 있는 것. 
 csv_files = [
-    f'D:/MultiModal/Data/Data_PreProcessing/Head_Rotation_Mouse/E_group/Face_1W_E1_S2.csv',
-    f'D:/MultiModal/Data/Data_PreProcessing/Head_Rotation_Mouse/E_group/Face_1W_E2_S2.csv',
-    f'D:/MultiModal/Data/Data_PreProcessing/Head_Rotation_Mouse/E_group/Face_1W_E3_S2.csv',
-    f'D:/MultiModal/Data/Data_PreProcessing/Head_Rotation_Mouse/E_group/Face_1W_E4_S2.csv',
+    f'D:/MultiModal/Data/Data_PreProcessing/Head_Rotation_Mouse/B_group/Face_1W_B1_S2.csv',
+    f'D:/MultiModal/Data/Data_PreProcessing/Head_Rotation_Mouse/B_group/Face_1W_B2_S2.csv',
+    f'D:/MultiModal/Data/Data_PreProcessing/Head_Rotation_Mouse/B_group/Face_1W_B3_S2.csv',
+    f'D:/MultiModal/Data/Data_PreProcessing/Head_Rotation_Mouse/B_group/Face_1W_B4_S2.csv',
 ]
 
 data_xlse = []
@@ -226,7 +226,7 @@ if valid_files:
 
     plt.tight_layout()
     #plt.show()
-    img_path = 'D:/MultiModal/MultiModal_Model/Head_Rotation_Mouse/PC and RC plot/E/'
-    plt.savefig(img_path + 'E_group_PC and RC_1W_S2.png')
+    img_path = 'D:/MultiModal/MultiModal_Model/Head_Rotation_Mouse/PC and RC plot/B/'
+    plt.savefig(img_path + 'B_group_PC and RC_1W_S2.png')
 else:
     print("Vaild data files not found. Processing skipped")

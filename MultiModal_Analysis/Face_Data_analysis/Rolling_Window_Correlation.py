@@ -39,9 +39,9 @@ def truncate_signals(signal1, signal2):
     return signal1[:min_length], signal2[:min_length]
     
 #'B','C','D','E','F','G'
-group_name = ['B','C','D','E','F','G']  
-weeks = ['2W', '3W', '4W']
-section_num = ['S1'] # 'S1', 
+group_name = ['A','B','C','D','E','F','G']  
+weeks = ['1W','2W', '3W', '4W']
+section_num = ['S1','S2'] 
 
 # Load data from CSV files
 total_path = 'D:/MultiModal/MultiModal_Model/Head_Rotation_Mouse/face_Synchrony/total_synchrony.csv'
