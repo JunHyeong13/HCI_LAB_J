@@ -44,17 +44,17 @@ weeks = ['1W','2W', '3W', '4W']
 section_num = ['S1','S2'] 
 
 # Load data from CSV files
-total_path = 'D:/MultiModal/MultiModal_Model/Head_Rotation_Mouse/face_Synchrony/total_synchrony.csv'
+total_path = 'D:/MultiModal/MultiModal_Model/Head_Rotation_Mouse/face_Synchrony/total_synchrony(delta).csv'
 total_synchrony = pd.DataFrame()
 
 for group in tqdm(group_name, desc = "Groups"): # desc: 진행 바 앞에 문자열을 출력하기 위해 쓰는 키워드 
     for week in tqdm(weeks, desc=f"Weeks for group {group}"):
         for section in tqdm(section_num, desc=f"section for week {week}"):
             csv_files = [
-                f'D:/MultiModal/Data/Data_PreProcessing/Head_Rotation_Mouse/{group}_group/Face_{week}_{group}1_{section}.csv',
-                f'D:/MultiModal/Data/Data_PreProcessing/Head_Rotation_Mouse/{group}_group/Face_{week}_{group}2_{section}.csv',
-                f'D:/MultiModal/Data/Data_PreProcessing/Head_Rotation_Mouse/{group}_group/Face_{week}_{group}3_{section}.csv',
-                f'D:/MultiModal/Data/Data_PreProcessing/Head_Rotation_Mouse/{group}_group/Face_{week}_{group}4_{section}.csv'
+                f'D:/MultiModal/Data/Data_PreProcessing/Head_Rotation_Mouse/{group}_group_delta/Face_{week}_{group}1_{section}.csv',
+                f'D:/MultiModal/Data/Data_PreProcessing/Head_Rotation_Mouse/{group}_group_delta/Face_{week}_{group}2_{section}.csv',
+                f'D:/MultiModal/Data/Data_PreProcessing/Head_Rotation_Mouse/{group}_group_delta/Face_{week}_{group}3_{section}.csv',
+                f'D:/MultiModal/Data/Data_PreProcessing/Head_Rotation_Mouse/{group}_group_delta/Face_{week}_{group}4_{section}.csv'
             ]
             
             data_xlse = [] 
@@ -80,10 +80,11 @@ for group in tqdm(group_name, desc = "Groups"): # desc: 진행 바 앞에 문자
                     continue
                 # 추출하고 싶은 데이터 값을 넣어 둠. 
                 data_xlse = [pd.read_csv(file) for file in csv_files]
-                data = [df['X'] for df in data_xlse] # X, Y, Z, Delta_X, Delta_Y, Delta_Z, Lip_Distance
+                data = [df['Delta_X'] for df in data_xlse] # X, Y, Z, Delta_X, Delta_Y, Delta_Z, Lip_Distance
+                # 현재 코드 기준에서는 , X 축을 본거고, delta x 값을 기준으로 안 뽑았군
                 
                 frame_rate = 25
-                data_frame_section = pd.DataFrame()
+                data_frame_section = pd.DataFrame() # 네 개의 신호 간 모든 쌍에 대해 상관 관계를 계산하여 section_means 값에 저장. 
                 section_means = []
                 
                 for i in range(4):
@@ -105,7 +106,7 @@ for group in tqdm(group_name, desc = "Groups"): # desc: 진행 바 앞에 문자
                         data_frame_section[col_name] = corr_data
                 
                 total_synchrony[f'{group}_{week}_{section}'] = section_means
-                excel_path = f'D:/MultiModal/MultiModal_Model/Head_Rotation_Mouse/face_Synchrony/Save_File/Face_{week}_{group}_{section}_Synchrony.csv'
+                excel_path = f'D:/MultiModal/MultiModal_Model/Head_Rotation_Mouse/face_Synchrony/Save_File_delta/Face_{week}_{group}_{section}_(delta)_Synchrony.csv'
                 data_frame_section.to_csv(excel_path, index=False)
 
 total_synchrony.to_csv(total_path, index=False)

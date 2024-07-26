@@ -1,4 +1,6 @@
 '''
+Pitch(=X axis) abs 값을 주차 별로 평균 내어 저장하는 코드 
+
 # import os
 # import pandas as pd
 # import numpy as np
@@ -18,7 +20,7 @@
 #         for i in ['1', '2', '3', '4']:
 #             for step in Steps:
 #                 # Set the directory path
-#                 directory_path = os.path.join(path, f'{group}_group/')
+#                 directory_path = os.path.join(path, f'{group}_group_delta/')
                 
 #                 # Get the list of files in the directory
 #                 if os.path.exists(directory_path):
@@ -29,26 +31,29 @@
 #                         if f'Face_{week}_{group}{i}_{step}' in file_name:
 #                             # Set the file path
 #                             file_path = os.path.join(directory_path, file_name)
-                        
 #                             read_test = pd.read_csv(file_path)
                             
 #                             # Calculate the mean of the 'Delta_X' column
 #                             x_mean = np.mean(read_test['Delta_X'])
-#                             #print(x_mean)
+#                             print(f"Current {week}_{group}{i}_{step} mean : ", x_mean)
                             
 #                             # Append the mean to the corresponding group and week
 #                             group_means[group][week].append(x_mean)
+#                             #print(group_means)
 
 # #NaN 값이 있을 시, 평균 값이 계산되지 않으므로, nan 부분이 있다면 넘어갈 수 있도록 세팅.
 # weekly_means = {group: {week: np.nanmean(values) if len(values) > 0 else np.nan for week, values in group_means[group].items()} for group in groups}
 
 # weekly_means_df = pd.DataFrame(weekly_means).T
-# output_path = 'D:/MultiModal/Data/Data_PreProcessing/Head_Rotation_Mouse/group_weekly_means.xlsx'
+# output_path = 'D:/MultiModal/Data/Data_PreProcessing/Head_Rotation_Mouse/group_weekly_delta_means.xlsx'
 # weekly_means_df.to_excel(output_path)
 # print(weekly_means_df)
 
 '''
 
+
+  
+'''    
 # 상관분석 및 산점도 그래프 시각화 하는 부분.
 import os
 import numpy as np 
@@ -56,7 +61,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 performance_data_path = 'C:/Users/user/Desktop/Group_performance.xlsx' 
-deltaX_data_path = 'D:/MultiModal/Data/Data_PreProcessing/Head_Rotation_Mouse/group_weekly_means.xlsx' 
+deltaX_data_path = 'D:/MultiModal/Data/Data_PreProcessing/Head_Rotation_Mouse/group_weekly_delta_means.xlsx' 
 
 # save the plots
 save_path = 'D:/MultiModal/MultiModal_Model/Head_Rotation_Mouse/Graph_delta_abs/'
@@ -99,7 +104,7 @@ plt.ylabel('Pearson Correlation Coefficient')
 plt.title('Correlation between Performance Scores and DeltaX by Week')
 plt.ylim(-1, 1)
 plt.axhline(0, color='gray', linestyle='--')
-plt.savefig(os.path.join(save_path, 'correlation_bar_plot.png')) 
+plt.savefig(os.path.join(save_path, 'correlation_bar_plot(detla).png')) 
 #plt.show()
 plt.close()
 
@@ -131,10 +136,92 @@ for i, week in enumerate(weeks):
 
 # Adjust layout
 plt.tight_layout()
-plt.savefig(os.path.join(save_path,'correlation_scatter_plots_with_regression_lines.png'))  # Save the scatter plots as a PNG file
+plt.savefig(os.path.join(save_path,'correlation_scatter_plots_with_regression_lines(delta).png'))  # Save the scatter plots as a PNG file
 #plt.show()
 plt.close()
 
+'''  
+
+#'''
+#face synchrony 값과 그룹의 성과 간의 상관관계를 그리는 코드. 
+# => 현재 코드에서는 전체 그룹의 주차를 평균 내어 그려진 것. 
+
+import os
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+#import seaborn as sns
+from scipy.stats import pearsonr
+
+# 파일 경로
+file_csv = 'D:/MultiModal/MultiModal_Model/Head_Rotation_Mouse/face_Synchrony/total_synchrony(delta).csv'
+file_excel = 'C:/Users/user/Desktop/Group_performance.xlsx'
+output = 'D:/MultiModal/MultiModal_Model/Head_Rotation_Mouse/face_Synchrony/'
+
+# CSV 파일 불러오기
+df_csv = pd.read_csv(file_csv)
+
+# Excel 파일 불러오기
+df_excel = pd.read_excel(file_excel)
+
+# 그룹 목록 추출
+groups = df_excel['Unnamed: 0']
+
+# 각 그룹별로 주차별 동기화 데이터 통합 (synchrony)읽어오는 곳 
+group_week_data = {}
+for group in groups:
+    group_week_data[group] = {
+        '1W': df_csv.filter(like=f'{group}_1W').mean(axis=1),
+        '2W': df_csv.filter(like=f'{group}_2W').mean(axis=1),
+        '3W': df_csv.filter(like=f'{group}_3W').mean(axis=1),
+        '4W': df_csv.filter(like=f'{group}_4W').mean(axis=1)
+    }
+
+# 상관관계와 p-value 계산 및 산점도 그리기
+results = []
+fig, axes = plt.subplots(len(groups), 4, figsize=(20, 5 * len(groups)))
+
+for i, group in enumerate(groups):
+    df_group_weeks = pd.DataFrame(group_week_data[group])
+    print(df_group_weeks)
+    df_group_perf = df_excel[df_excel['Unnamed: 0'] == group].iloc[:, 1:].T
+    df_group_perf.columns = [group]
+    print(df_group_perf)
+    
+    # 공통 인덱스 찾기
+    common_index = df_group_weeks.index.intersection(df_group_perf.index)
+    df_group_weeks = df_group_weeks.loc[common_index]
+    df_group_perf = df_group_perf.loc[common_index]
+    
+    for j, week in enumerate(['1W', '2W', '3W', '4W']):
+        # 성과 데이터 추출
+        performance_data = df_group_perf[group]
+        
+        if len(df_group_weeks[week]) > 1 and len(performance_data) > 1:
+            # 동기화 데이터와 성과 데이터 간 상관관계와 p-value 계산
+            corr, p_value = pearsonr(df_group_weeks[week], performance_data)
+            results.append((group, week, corr, p_value))
+
+            # 산점도 및 회귀선 그리기
+            sns.scatterplot(ax=axes[i, j], x=df_group_weeks[week], y=performance_data, color='blue')
+            sns.regplot(ax=axes[i, j], x=df_group_weeks[week], y=performance_data, scatter=False, color='red')
+            axes[i, j].set_title(f'{group} {week} (r={corr:.2f}, p={p_value:.2g})')
+        else:
+            axes[i, j].set_title(f'{group} {week} (Insufficient data)')
+        
+        axes[i, j].set_xlabel('Synchronization')
+        axes[i, j].set_ylabel('Performance')
+        axes[i, j].set_xlim(-1, 1)  # x 축 범위를 -1에서 1로 설정
+
+plt.tight_layout()
+plt.show()
+
+# 결과 데이터프레임 생성 및 출력
+results_df = pd.DataFrame(results, columns=['Group', 'Week', 'Correlation', 'P-value'])
+results_df.to_csv(os.path.join(output, 'Group_synchrony(Correlation).csv'))
+print(results_df)
+
+#'''
 
 '''
 
