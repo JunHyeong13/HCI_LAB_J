@@ -145,81 +145,75 @@ plt.close()
 #'''
 #face synchrony 값과 그룹의 성과 간의 상관관계를 그리는 코드. 
 # => 현재 코드에서는 전체 그룹의 주차를 평균 내어 그려진 것. 
-
 import os
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-#import seaborn as sns
+import seaborn as sns
 from scipy.stats import pearsonr
 
 # 파일 경로
-file_csv = 'D:/MultiModal/MultiModal_Model/Head_Rotation_Mouse/face_Synchrony/total_synchrony(delta).csv'
-file_excel = 'C:/Users/user/Desktop/Group_performance.xlsx'
+# file_csv = 'D:/MultiModal/MultiModal_Model/Head_Rotation_Mouse/face_Synchrony/total_synchrony(delta)_1.xlsx'
+# file_excel = 'C:/Users/user/Desktop/Group_performance.xlsx'
 output = 'D:/MultiModal/MultiModal_Model/Head_Rotation_Mouse/face_Synchrony/'
 
-# CSV 파일 불러오기
-df_csv = pd.read_csv(file_csv)
+# 파일 경로
+group_performance_file = 'C:/Users/user/Desktop/Group_performance.xlsx'
+total_synchrony_file = 'D:/MultiModal/MultiModal_Model/Head_Rotation_Mouse/face_Synchrony/total_synchrony(delta)_1.xlsx'
 
-# Excel 파일 불러오기
-df_excel = pd.read_excel(file_excel)
+# 데이터 불러오기
+group_performance = pd.read_excel(group_performance_file)
+total_synchrony = pd.read_excel(total_synchrony_file)
 
-# 그룹 목록 추출
-groups = df_excel['Unnamed: 0']
+# 그룹 이름을 인덱스로 설정
+group_performance.set_index('Unnamed: 0', inplace=True)
+total_synchrony.set_index('Unnamed: 0', inplace=True)
 
-# 각 그룹별로 주차별 동기화 데이터 통합 (synchrony)읽어오는 곳 
-group_week_data = {}
-for group in groups:
-    group_week_data[group] = {
-        '1W': df_csv.filter(like=f'{group}_1W').mean(axis=1),
-        '2W': df_csv.filter(like=f'{group}_2W').mean(axis=1),
-        '3W': df_csv.filter(like=f'{group}_3W').mean(axis=1),
-        '4W': df_csv.filter(like=f'{group}_4W').mean(axis=1)
-    }
+# 두 데이터프레임 병합
+merged_data = group_performance.join(total_synchrony, lsuffix='_performance', rsuffix='_synchrony')
+# 데이터 확인을 위해 csv 파일로 내보내기.
+#merged_data.to_csv(os.path.join(output, 'Merged_data.csv'))
 
-# 상관관계와 p-value 계산 및 산점도 그리기
-results = []
-fig, axes = plt.subplots(len(groups), 4, figsize=(20, 5 * len(groups)))
+# NaN 값이 있는 행 제거
+cleaned_data = merged_data.dropna()
+#print(cleaned_data)
 
-for i, group in enumerate(groups):
-    df_group_weeks = pd.DataFrame(group_week_data[group])
-    print(df_group_weeks)
-    df_group_perf = df_excel[df_excel['Unnamed: 0'] == group].iloc[:, 1:].T
-    df_group_perf.columns = [group]
-    print(df_group_perf)
-    
-    # 공통 인덱스 찾기
-    common_index = df_group_weeks.index.intersection(df_group_perf.index)
-    df_group_weeks = df_group_weeks.loc[common_index]
-    df_group_perf = df_group_perf.loc[common_index]
-    
-    for j, week in enumerate(['1W', '2W', '3W', '4W']):
-        # 성과 데이터 추출
-        performance_data = df_group_perf[group]
-        
-        if len(df_group_weeks[week]) > 1 and len(performance_data) > 1:
-            # 동기화 데이터와 성과 데이터 간 상관관계와 p-value 계산
-            corr, p_value = pearsonr(df_group_weeks[week], performance_data)
-            results.append((group, week, corr, p_value))
+# 여러 주차의 동기화 데이터를 한 번에 시각화하기 위해 melt 사용
+melted_data = cleaned_data.melt(id_vars=['TOTAL'], value_vars=['1W_synchrony', '2W_synchrony', '3W_synchrony', '4W_synchrony'], 
+                                var_name='Week', value_name='Synchrony')
 
-            # 산점도 및 회귀선 그리기
-            sns.scatterplot(ax=axes[i, j], x=df_group_weeks[week], y=performance_data, color='blue')
-            sns.regplot(ax=axes[i, j], x=df_group_weeks[week], y=performance_data, scatter=False, color='red')
-            axes[i, j].set_title(f'{group} {week} (r={corr:.2f}, p={p_value:.2g})')
-        else:
-            axes[i, j].set_title(f'{group} {week} (Insufficient data)')
-        
-        axes[i, j].set_xlabel('Synchronization')
-        axes[i, j].set_ylabel('Performance')
-        axes[i, j].set_xlim(-1, 1)  # x 축 범위를 -1에서 1로 설정
 
-plt.tight_layout()
+# 성능(TOTAL)과 각 주차의 동기화 데이터 간의 상관관계 및 p-value 계산
+correlation_results = []
+for week in ['1W_synchrony', '2W_synchrony', '3W_synchrony', '4W_synchrony']:
+    corr, p_value = pearsonr(cleaned_data['TOTAL'], cleaned_data[week])
+    correlation_results.append((week, corr, p_value))
+
+# 상관관계 및 p-value 텍스트 생성
+correlation_texts = [f"{week}: r={corr:.2f}, p={p_value:.2e}" for week, corr, p_value in correlation_results]
+correlation_text = "\n".join(correlation_texts)
+
+# 산점도 그리기 (그룹 이름을 표시)
+plt.figure(figsize=(10, 8))
+sns.scatterplot(data=melted_data, x='TOTAL', y='Synchrony', hue='Week', style='Week', s=100)
+
+# 각 데이터 포인트에 그룹 이름 추가
+for i in range(cleaned_data.shape[0]):
+    plt.text(cleaned_data['TOTAL'].iloc[i], cleaned_data['1W_synchrony'].iloc[i], cleaned_data.index[i], horizontalalignment='right')
+    plt.text(cleaned_data['TOTAL'].iloc[i], cleaned_data['2W_synchrony'].iloc[i], cleaned_data.index[i], horizontalalignment='right')
+    plt.text(cleaned_data['TOTAL'].iloc[i], cleaned_data['3W_synchrony'].iloc[i], cleaned_data.index[i], horizontalalignment='right')
+    plt.text(cleaned_data['TOTAL'].iloc[i], cleaned_data['4W_synchrony'].iloc[i], cleaned_data.index[i], horizontalalignment='right')
+
+# 상관관계 및 p-value 텍스트 추가
+plt.annotate(correlation_text, xy=(0.05, 0.95), xycoords='axes fraction', fontsize=12, 
+             verticalalignment='top', bbox=dict(boxstyle='round,pad=0.5', facecolor='white', alpha=0.5))
+
+plt.title('Scatter Plot of Total Performance vs. Synchrony (1W to 4W)')
+plt.xlabel('Total Performance')
+plt.ylabel('Synchrony')
+plt.grid(True)
+plt.legend(title='Week')
 plt.show()
-
-# 결과 데이터프레임 생성 및 출력
-results_df = pd.DataFrame(results, columns=['Group', 'Week', 'Correlation', 'P-value'])
-results_df.to_csv(os.path.join(output, 'Group_synchrony(Correlation).csv'))
-print(results_df)
 
 #'''
 
