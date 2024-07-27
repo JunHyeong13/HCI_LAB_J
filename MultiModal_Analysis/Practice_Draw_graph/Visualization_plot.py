@@ -142,55 +142,56 @@ plt.close()
 '''  
 
 #'''
-#face synchrony 값과 그룹의 성과 간의 상관관계를 그리는 코드. 
+#face synchrony week값과 그룹의 성과 total 값간의 상관관계를 그리는 코드. 
 # => 현재 코드에서는 전체 그룹의 주차를 평균 내어 그려진 것. 
-import os
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
-from scipy.stats import pearsonr
 
-# 파일 경로
-# file_csv = 'D:/MultiModal/MultiModal_Model/Head_Rotation_Mouse/face_Synchrony/total_synchrony(delta)_1.xlsx'
-# file_excel = 'C:/Users/user/Desktop/Group_performance.xlsx'
-output = 'D:/MultiModal/MultiModal_Model/Head_Rotation_Mouse/face_Synchrony/'
+# import os
+# import pandas as pd
+# import numpy as np
+# import matplotlib.pyplot as plt
+# import seaborn as sns
+# from scipy.stats import pearsonr
 
-# 파일 경로
-group_performance_file = 'C:/Users/user/Desktop/Group_performance.xlsx'
-total_synchrony_file = 'D:/MultiModal/MultiModal_Model/Head_Rotation_Mouse/face_Synchrony/total_synchrony(delta)_1.xlsx'
+# # 파일 경로
+# # file_csv = 'D:/MultiModal/MultiModal_Model/Head_Rotation_Mouse/face_Synchrony/total_synchrony(delta)_1.xlsx'
+# # file_excel = 'C:/Users/user/Desktop/Group_performance.xlsx'
+# output = 'D:/MultiModal/MultiModal_Model/Head_Rotation_Mouse/face_Synchrony/'
 
-# 데이터 불러오기
-group_performance = pd.read_excel(group_performance_file)
-total_synchrony = pd.read_excel(total_synchrony_file)
+# # 파일 경로
+# group_performance_file = 'C:/Users/user/Desktop/Group_performance.xlsx'
+# total_synchrony_file = 'D:/MultiModal/MultiModal_Model/Head_Rotation_Mouse/face_Synchrony/total_synchrony(delta)_1.xlsx'
 
-# 그룹 이름을 인덱스로 설정
-group_performance.set_index('Unnamed: 0', inplace=True)
-total_synchrony.set_index('Unnamed: 0', inplace=True)
+# # 데이터 불러오기
+# group_performance = pd.read_excel(group_performance_file)
+# total_synchrony = pd.read_excel(total_synchrony_file)
 
-# 두 데이터프레임 병합
-merged_data = group_performance.join(total_synchrony, lsuffix='_performance', rsuffix='_synchrony')
-# 데이터 확인을 위해 csv 파일로 내보내기.
-#merged_data.to_csv(os.path.join(output, 'Merged_data.csv'))
+# # 그룹 이름을 인덱스로 설정
+# group_performance.set_index('Unnamed: 0', inplace=True)
+# total_synchrony.set_index('Unnamed: 0', inplace=True)
 
-# NaN 값이 있는 행 제거
-cleaned_data = merged_data.dropna()
-#print(cleaned_data)
+# # 두 데이터프레임 병합
+# merged_data = group_performance.join(total_synchrony, lsuffix='_performance', rsuffix='_synchrony')
+# # 데이터 확인을 위해 csv 파일로 내보내기.
+# #merged_data.to_csv(os.path.join(output, 'Merged_data.csv'))
 
-# 여러 주차의 동기화 데이터를 한 번에 시각화하기 위해 melt 사용
-melted_data = cleaned_data.melt(id_vars=['TOTAL'], value_vars=['1W_synchrony', '2W_synchrony', '3W_synchrony', '4W_synchrony'], 
-                                var_name='Week', value_name='Synchrony')
+# # NaN 값이 있는 행 제거
+# cleaned_data = merged_data.dropna()
+# #print(cleaned_data)
+
+# # 여러 주차의 동기화 데이터를 한 번에 시각화하기 위해 melt 사용
+# melted_data = cleaned_data.melt(id_vars=['TOTAL'], value_vars=['1W_synchrony', '2W_synchrony', '3W_synchrony', '4W_synchrony'], 
+#                                 var_name='Week', value_name='Synchrony')
 
 
-# 성능(TOTAL)과 각 주차의 동기화 데이터 간의 상관관계 및 p-value 계산
-correlation_results = []
-for week in ['1W_synchrony', '2W_synchrony', '3W_synchrony', '4W_synchrony']:
-    corr, p_value = pearsonr(cleaned_data['TOTAL'], cleaned_data[week])
-    correlation_results.append((week, corr, p_value))
+# # 성능(TOTAL)과 각 주차의 동기화 데이터 간의 상관관계 및 p-value 계산
+# correlation_results = []
+# for week in ['1W_synchrony', '2W_synchrony', '3W_synchrony', '4W_synchrony']:
+#     corr, p_value = pearsonr(cleaned_data['TOTAL'], cleaned_data[week])
+#     correlation_results.append((week, corr, p_value))
 
-# 상관관계 및 p-value 텍스트 생성
-correlation_texts = [f"{week}: r={corr:.2f}, p={p_value:.2e}" for week, corr, p_value in correlation_results]
-print(correlation_texts)
+# # 상관관계 및 p-value 텍스트 생성
+# correlation_texts = [f"{week}: r={corr:.2f}, p={p_value:.2e}" for week, corr, p_value in correlation_results]
+# #print(correlation_texts)
 # correlation_text = "\n".join(correlation_texts)
 
 # # 산점도 그리기 (그룹 이름을 표시)
@@ -216,6 +217,66 @@ print(correlation_texts)
 # plt.show()
 
 #'''
+
+# face synchrony week값과 그룹의 성과 week 값 간의 상관관계를 그리는 코드. 
+
+import os
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from scipy.stats import pearsonr
+
+# 파일 경로
+group_performance_file = 'C:/Users/user/Desktop/Group_performance.xlsx'
+total_synchrony_file = 'D:/MultiModal/MultiModal_Model/Head_Rotation_Mouse/face_Synchrony/total_synchrony(delta)_1.xlsx'
+save_path = 'D:/MultiModal/MultiModal_Model/Head_Rotation_Mouse/face_Synchrony/'
+
+# 데이터 불러오기
+group_performance = pd.read_excel(group_performance_file)
+total_synchrony = pd.read_excel(total_synchrony_file)
+
+# 그룹 이름을 인덱스로 설정
+group_performance.set_index('Unnamed: 0', inplace=True)
+total_synchrony.set_index('Unnamed: 0', inplace=True)
+
+# 두 데이터프레임 병합
+merged_data = group_performance.join(total_synchrony, lsuffix='_performance', rsuffix='_synchrony')
+
+# NaN 값이 있는 행 제거
+cleaned_data = merged_data.dropna()
+
+# y축 값의 범위를 통일하기 위해 최솟값과 최댓값 계산
+y_min = cleaned_data[['1W_synchrony', '2W_synchrony', '3W_synchrony', '4W_synchrony']].min().min()
+y_max = cleaned_data[['1W_synchrony', '2W_synchrony', '3W_synchrony', '4W_synchrony']].max().max()
+
+# 각 주차별로 성능과 동기화 데이터 간의 상관관계 및 산점도 그리기
+weeks = ['1W', '2W', '3W', '4W']
+
+plt.figure(figsize=(14, 10))
+
+for i, week in enumerate(weeks, 1):
+    x = cleaned_data[f'{week}_performance']
+    y = cleaned_data[f'{week}_synchrony']
+    
+    # 상관관계 및 p-value 계산
+    corr, p_value = pearsonr(x, y)
+    corr_text = f'{week}: r={corr:.2f}, p={p_value:.2e}'
+    
+    # 산점도 그리기
+    plt.subplot(2, 2, i)
+    sns.scatterplot(x=x, y=y)
+    plt.title(f'Scatter Plot of {week}_performance vs. {week}_synchrony')
+    plt.xlabel(f'{week}_performance')
+    plt.ylabel(f'{week}_synchrony')
+    #plt.ylim(y_min, y_max)
+    plt.annotate(corr_text, xy=(0.05, 0.95), xycoords='axes fraction', fontsize=12, 
+                 verticalalignment='top', bbox=dict(boxstyle='round,pad=0.5', facecolor='white', alpha=0.5))
+
+plt.tight_layout()
+plt.savefig(os.path.join(save_path, 'Group_performance & synchrony value'))
+#plt.show()
+plt.close()
 
 '''
 
