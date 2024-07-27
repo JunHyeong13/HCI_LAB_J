@@ -52,7 +52,6 @@ Pitch(=X axis) abs 값을 주차 별로 평균 내어 저장하는 코드
 '''
 
 
-  
 '''    
 # 상관분석 및 산점도 그래프 시각화 하는 부분.
 import os
@@ -191,29 +190,30 @@ for week in ['1W_synchrony', '2W_synchrony', '3W_synchrony', '4W_synchrony']:
 
 # 상관관계 및 p-value 텍스트 생성
 correlation_texts = [f"{week}: r={corr:.2f}, p={p_value:.2e}" for week, corr, p_value in correlation_results]
-correlation_text = "\n".join(correlation_texts)
+print(correlation_texts)
+# correlation_text = "\n".join(correlation_texts)
 
-# 산점도 그리기 (그룹 이름을 표시)
-plt.figure(figsize=(10, 8))
-sns.scatterplot(data=melted_data, x='TOTAL', y='Synchrony', hue='Week', style='Week', s=100)
+# # 산점도 그리기 (그룹 이름을 표시)
+# plt.figure(figsize=(10, 8))
+# sns.scatterplot(data=melted_data, x='TOTAL', y='Synchrony', hue='Week', style='Week', s=100)
 
-# 각 데이터 포인트에 그룹 이름 추가
-for i in range(cleaned_data.shape[0]):
-    plt.text(cleaned_data['TOTAL'].iloc[i], cleaned_data['1W_synchrony'].iloc[i], cleaned_data.index[i], horizontalalignment='right')
-    plt.text(cleaned_data['TOTAL'].iloc[i], cleaned_data['2W_synchrony'].iloc[i], cleaned_data.index[i], horizontalalignment='right')
-    plt.text(cleaned_data['TOTAL'].iloc[i], cleaned_data['3W_synchrony'].iloc[i], cleaned_data.index[i], horizontalalignment='right')
-    plt.text(cleaned_data['TOTAL'].iloc[i], cleaned_data['4W_synchrony'].iloc[i], cleaned_data.index[i], horizontalalignment='right')
+# # 각 데이터 포인트에 그룹 이름 추가
+# for i in range(cleaned_data.shape[0]):
+#     plt.text(cleaned_data['TOTAL'].iloc[i], cleaned_data['1W_synchrony'].iloc[i], cleaned_data.index[i], horizontalalignment='right')
+#     plt.text(cleaned_data['TOTAL'].iloc[i], cleaned_data['2W_synchrony'].iloc[i], cleaned_data.index[i], horizontalalignment='right')
+#     plt.text(cleaned_data['TOTAL'].iloc[i], cleaned_data['3W_synchrony'].iloc[i], cleaned_data.index[i], horizontalalignment='right')
+#     plt.text(cleaned_data['TOTAL'].iloc[i], cleaned_data['4W_synchrony'].iloc[i], cleaned_data.index[i], horizontalalignment='right')
 
-# 상관관계 및 p-value 텍스트 추가
-plt.annotate(correlation_text, xy=(0.05, 0.95), xycoords='axes fraction', fontsize=12, 
-             verticalalignment='top', bbox=dict(boxstyle='round,pad=0.5', facecolor='white', alpha=0.5))
+# # 상관관계 및 p-value 텍스트 추가
+# plt.annotate(correlation_text, xy=(0.05, 0.95), xycoords='axes fraction', fontsize=12, 
+#              verticalalignment='top', bbox=dict(boxstyle='round,pad=0.5', facecolor='white', alpha=0.5))
 
-plt.title('Scatter Plot of Total Performance vs. Synchrony (1W to 4W)')
-plt.xlabel('Total Performance')
-plt.ylabel('Synchrony')
-plt.grid(True)
-plt.legend(title='Week')
-plt.show()
+# plt.title('Scatter Plot of Total Performance vs. Synchrony (1W to 4W)')
+# plt.xlabel('Total Performance')
+# plt.ylabel('Synchrony')
+# plt.grid(True)
+# plt.legend(title='Week')
+# plt.show()
 
 #'''
 
