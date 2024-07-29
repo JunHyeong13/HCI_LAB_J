@@ -229,26 +229,38 @@ from scipy.stats import pearsonr
 
 # 파일 경로
 group_performance_file = 'C:/Users/user/Desktop/Group_performance.xlsx'
+# 주차 별, pitch x 값의 변화량을 average한 값. 
 total_synchrony_file = 'D:/MultiModal/MultiModal_Model/Head_Rotation_Mouse/face_Synchrony/total_synchrony(delta)_1.xlsx'
+
+# 얼굴 총 움직임량 값을 average한 값. 
+face_total = 'C:/Users/user/Documents/Face_Rotation_total.xlsx'
+
+# plot을 저장하기 위한 부분.
 save_path = 'D:/MultiModal/MultiModal_Model/Head_Rotation_Mouse/face_Synchrony/'
+
 
 # 데이터 불러오기
 group_performance = pd.read_excel(group_performance_file)
-total_synchrony = pd.read_excel(total_synchrony_file)
+#total_synchrony = pd.read_excel(total_synchrony_file)
+# 얼굴 총 움직임량 값 불러오는 위치.
+total_face_rotation = pd.read_excel(face_total)
 
 # 그룹 이름을 인덱스로 설정
 group_performance.set_index('Unnamed: 0', inplace=True)
-total_synchrony.set_index('Unnamed: 0', inplace=True)
+#total_synchrony.set_index('Unnamed: 0', inplace=True)
+total_face_rotation.set_index('Unnamed: 0', inplace=True)
 
 # 두 데이터프레임 병합
-merged_data = group_performance.join(total_synchrony, lsuffix='_performance', rsuffix='_synchrony')
+#merged_data = group_performance.join(total_synchrony, lsuffix='_performance', rsuffix='_synchrony')
+merged_data = group_performance.join(total_face_rotation, lsuffix='_performance', rsuffix='_face rotation')
+
 
 # NaN 값이 있는 행 제거
 cleaned_data = merged_data.dropna()
 
 # y축 값의 범위를 통일하기 위해 최솟값과 최댓값 계산
-y_min = cleaned_data[['1W_synchrony', '2W_synchrony', '3W_synchrony', '4W_synchrony']].min().min()
-y_max = cleaned_data[['1W_synchrony', '2W_synchrony', '3W_synchrony', '4W_synchrony']].max().max()
+#y_min = cleaned_data[['1W_synchrony', '2W_synchrony', '3W_synchrony', '4W_synchrony']].min().min()
+#y_max = cleaned_data[['1W_synchrony', '2W_synchrony', '3W_synchrony', '4W_synchrony']].max().max()
 
 # 각 주차별로 성능과 동기화 데이터 간의 상관관계 및 산점도 그리기
 weeks = ['1W', '2W', '3W', '4W']
@@ -257,7 +269,9 @@ plt.figure(figsize=(14, 10))
 
 for i, week in enumerate(weeks, 1):
     x = cleaned_data[f'{week}_performance']
-    y = cleaned_data[f'{week}_synchrony']
+    #y = cleaned_data[f'{week}_synchrony']
+    y = cleaned_data[f'{week}_face rotation']
+    
     
     # 상관관계 및 p-value 계산
     corr, p_value = pearsonr(x, y)
@@ -266,17 +280,18 @@ for i, week in enumerate(weeks, 1):
     # 산점도 그리기
     plt.subplot(2, 2, i)
     sns.scatterplot(x=x, y=y)
-    plt.title(f'Scatter Plot of {week}_performance vs. {week}_synchrony')
+    #plt.title(f'Scatter Plot of {week}_performance vs. {week}_synchrony')
+    plt.title(f'Scatter Plot of {week}_performance vs. {week}_face rotation')
     plt.xlabel(f'{week}_performance')
-    plt.ylabel(f'{week}_synchrony')
+    plt.ylabel(f'{week}_face rotation')
     #plt.ylim(y_min, y_max)
     plt.annotate(corr_text, xy=(0.05, 0.95), xycoords='axes fraction', fontsize=12, 
                  verticalalignment='top', bbox=dict(boxstyle='round,pad=0.5', facecolor='white', alpha=0.5))
 
 plt.tight_layout()
-plt.savefig(os.path.join(save_path, 'Group_performance & synchrony value'))
-#plt.show()
-plt.close()
+#plt.savefig(os.path.join(save_path, 'Group_performance & face rotation'))
+plt.show()
+#plt.close()
 
 '''
 
