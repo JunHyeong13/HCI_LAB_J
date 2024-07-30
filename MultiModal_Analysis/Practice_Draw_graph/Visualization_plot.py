@@ -1,6 +1,5 @@
 #Pitch(=X axis) abs 값을 주차 별로 평균 내어 저장하는 코드
 ''' 
-
 # import os
 # import pandas as pd
 # import numpy as np
@@ -217,8 +216,8 @@ plt.close()
 
 '''
 
+'''
 # face synchrony week값과 그룹의 성과 week 값 간의 상관관계를 그리는 코드. 
-
 import os
 import pandas as pd
 import numpy as np
@@ -235,33 +234,44 @@ group_performance_file = 'C:/Users/user/Desktop/Group_performance.xlsx'
 #face_total = 'C:/Users/user/Documents/Face_Rotation_total.xlsx'
 
 # 얼굴 몸 움직임량 값을 저장한 부분.
-face_movement = 'D:/MultiModal/Data/Data_PreProcessing/Head_Rotation_Mouse/group_weekly_face_movement.xlsx'
+#face_movement = 'D:/MultiModal/Data/Data_PreProcessing/Head_Rotation_Mouse/group_weekly_face_movement.xlsx'
+#body_movement = 'C:/Users/user/Documents/Body_total_movement.xlsx'
+
+lip_distance = 'D:/MultiModal/Data/Data_PreProcessing/Head_Rotation_Mouse/group_weekly_lip_distance_means.xlsx'  
 
 # plot을 저장하기 위한 부분.
 save_path = 'D:/MultiModal/MultiModal_Model/Head_Rotation_Mouse/face_Synchrony/'
 
 # 데이터 불러오기
 group_performance = pd.read_excel(group_performance_file)
+
 #total_synchrony = pd.read_excel(total_synchrony_file)
 # 얼굴 총 움직임량 값 불러오는 위치.
 #total_face_rotation = pd.read_excel(face_total)
-total_face_movement= pd.read_excel(face_movement)
+#total_face_movement = pd.read_excel(face_movement)
+
+#total_body_movement = pd.read_excel(body_movement)
+total_lip_distance = pd.read_excel(lip_distance)
 
 # 그룹 이름을 인덱스로 설정
 group_performance.set_index('Unnamed: 0', inplace=True)
 #total_synchrony.set_index('Unnamed: 0', inplace=True)
 #total_face_rotation.set_index('Unnamed: 0', inplace=True)
-total_face_movement.set_index('Unnamed: 0', inplace=True)
+#total_face_movement.set_index('Unnamed: 0', inplace=True)
+#total_body_movement.set_index('Unnamed: 0', inplace=True)
+total_lip_distance.set_index('Unnamed: 0', inplace=True)
 
 # 두 데이터프레임 병합(X 축에는 그룹 성과 점수)
 #merged_data = group_performance.join(total_synchrony, lsuffix='_performance', rsuffix='_synchrony')
 #merged_data = group_performance.join(total_face_rotation, lsuffix='_performance', rsuffix='_face_rotation')
+#merged_data = group_performance.join(total_body_movement, lsuffix='_performance', rsuffix='_lip_distance')
+merged_data = group_performance.join(total_lip_distance, lsuffix='_performance', rsuffix='_lip_distance')
 
 '''
 #y 축에는 총 얼굴 회전량 값을 넣어주기 위함.
 '''
 #merged_data = total_synchrony.join(total_face_rotation, lsuffix='_Synchrony', rsuffix='_face_movement')
-merged_data = total_face_movement.join(group_performance, lsuffix='_face_movement', rsuffix='_group_performance')
+#merged_data = total_face_movement.join(group_performance, lsuffix='_face_movement', rsuffix='_group_performance')
 
 # NaN 값이 있는 행 제거
 cleaned_data = merged_data.dropna()
@@ -286,8 +296,8 @@ cleaned_data['Unnamed: 0'] = cleaned_data['Unnamed: 0'].fillna('Group')
 long_data = pd.DataFrame()
 
 for week in weeks:
-    temp_df = cleaned_data[[f'{week}_face_movement', f'{week}_group_performance']].copy() # _performance
-    temp_df.columns = ['face_movement', 'Performance'] # 'Synchrony'
+    temp_df = cleaned_data[[f'{week}_lip_distance', f'{week}_performance']].copy() # _performance
+    temp_df.columns = ['lip_distance', 'Performance'] # 'Synchrony'
     temp_df['Week'] = week
     temp_df['Group'] = cleaned_data['Unnamed: 0']
     long_data = pd.concat([long_data, temp_df])
@@ -295,18 +305,18 @@ for week in weeks:
 plt.figure(figsize=(14, 10))
 
 # 산점도 그리기
-scatter = sns.scatterplot(data=long_data, x='Performance', y='face_movement', hue='Group', style='Week', palette='tab10', s=100)
-sns.regplot(data=long_data, x='Performance', y='face_movement', scatter=False)
+scatter = sns.scatterplot(data=long_data, x='Performance', y='lip_distance', hue='Group', style='Week', palette='tab10', s=100)
+sns.regplot(data=long_data, x='Performance', y='lip_distance', scatter=False)
 
 # 각 주차별 상관관계 및 p-value 계산 및 주석 추가
 for week in weeks:
     week_data = long_data[long_data['Week'] == week]
-    corr, p_value = pearsonr(week_data['Performance'], week_data['face_movement']) # face_rotation
+    corr, p_value = pearsonr(week_data['Performance'], week_data['lip_distance']) # face_rotation
     corr_text = f'{week}: r={corr:.2f}, p={p_value:.2e}'
     plt.annotate(corr_text, xy=(0.05, 0.95 - 0.05 * weeks.index(week)), xycoords='axes fraction', fontsize=12, 
                  verticalalignment='top', bbox=dict(boxstyle='round,pad=0.5', facecolor='white', alpha=0.5))
 
-
+'''
 # 이전에 하나의 그래프가 아닌 4개의 그래프로 값을 따로 보여줄 때의 코드 
 # # for i, week in enumerate(weeks, 1):
 # #     x = cleaned_data[f'{week}_performance']
@@ -326,30 +336,28 @@ for week in weeks:
 # #     scatter = sns.scatterplot(x=x, y=y, hue=cleaned_data['Unnamed: 0'], style=week, palette='tab10', s=100)
 # #     #sns.regplot(x=x, y=y, scatter=False, ax=plt.gca())
 # #     sns.regplot(x=x, y=y, scatter=False, label=corr_text)
-    
+   
+'''
+   
 '''
 #plt 을 출력하기 위한 이름, 저장하기 위한 코드 정립. 
 '''
-plt.title('Scatter Plot of Group Performance vs. face movement (1W to 4W)')
+plt.title('Scatter Plot of Group Performance vs. lip distance (1W to 4W)')
 plt.xlabel('Performance')
-plt.ylabel('face movement') # face movement
+plt.ylabel('lip distance') # face movement
 
 '''
 #x,y 축의 범위를 조정해줄 때 사용하는 코드.
-'''
 #plt.xlim(10, 50)
 #plt.ylim(0.0, 3.0) # (0.0, 3.0) (-0.005, 0.025)
+'''
 
 plt.legend(title='Group & Week', bbox_to_anchor=(1.05, 1), loc='upper left')
 plt.tight_layout()
-plt.savefig(os.path.join(save_path, 'Group_Performance_vs_face_movement_all_weeks.png'))
+plt.savefig(os.path.join(save_path, 'Group_Performance_vs_lip_distance_all_weeks.png')) # body_movement_all
 #plt.show()
 plt.close()
 
-
-#### 이전에 코딩한 부분. 
-'''
-이전에 코딩한 부분. 
 #     plt.title(f'Scatter Plot of {week}_performance vs. {week}_synchrony')
 #     #plt.title(f'Scatter Plot of {week}_performance vs. {week}_face rotation')
 #     plt.xlabel(f'{week}_performance')
@@ -376,13 +384,11 @@ plt.close()
 # plt.savefig(os.path.join(save_path, 'Group_performance & group synchrony')) # group synchrony || face rotation
 # plt.show()
 # plt.close()
-
-
 '''
+
 
 
 # 주차별로 average()한 값을 출력해줄것.
-'''
 import os
 import pandas as pd
 import numpy as np
@@ -398,7 +404,13 @@ group_performance_file = 'C:/Users/user/Desktop/Group_performance.xlsx'
 #face_total = 'C:/Users/user/Documents/Face_Rotation_total.xlsx'
 
 # 얼굴 몸 움직임량 값을 저장한 부분.
-face_movement = 'D:/MultiModal/Data/Data_PreProcessing/Head_Rotation_Mouse/group_weekly_face_movement.xlsx'
+#face_movement = 'D:/MultiModal/Data/Data_PreProcessing/Head_Rotation_Mouse/group_weekly_face_movement.xlsx'
+
+# 몸 움직임량 값을 저장한 부분. 
+#body_movement = 'C:/Users/user/Documents/Body_total_movement.xlsx'
+
+#얼굴 입 모양 값을 저장한 부분. 
+lip_distance = 'D:/MultiModal/Data/Data_PreProcessing/Head_Rotation_Mouse/group_weekly_lip_distance_means.xlsx'  
 
 # plot을 저장하기 위한 부분.
 save_path = 'D:/MultiModal/MultiModal_Model/Head_Rotation_Mouse/face_Synchrony/'
@@ -409,19 +421,25 @@ group_performance = pd.read_excel(group_performance_file)
 # 얼굴 총 회전량 값 불러오는 위치.
 #total_face_rotation = pd.read_excel(face_total)
 # 얼굴 몸 움직임량 값 불러오는 위치. 
-total_face_movement = pd.read_excel(face_movement)
+#total_face_movement = pd.read_excel(face_movement)
+#total_body_movement = pd.read_excel(body_movement)
+total_lip_distance = pd.read_excel(lip_distance)
 
 # 그룹 이름을 인덱스로 설정
 group_performance.set_index(group_performance.columns[0], inplace=True)
 #total_synchrony.set_index(total_synchrony.columns[0], inplace=True)
 #total_face_rotation.set_index(total_face_rotation.columns[0], inplace=True)
-total_face_movement.set_index(total_face_movement.columns[0], inplace=True)
+#total_face_movement.set_index(total_face_movement.columns[0], inplace=True)
+#total_body_movement.set_index(total_body_movement.columns[0], inplace=True)
+total_lip_distance.set_index(total_lip_distance.columns[0], inplace=True)
 
 # 두 데이터프레임 병합
 #merged_data = group_performance.join(total_synchrony, lsuffix='_performance', rsuffix='_synchrony')
-merged_data = group_performance.join(total_face_movement, lsuffix='_performance', rsuffix='_face_movement')
+#merged_data = group_performance.join(total_face_movement, lsuffix='_performance', rsuffix='_face_movement')
 #merged_data = total_synchrony.join(total_face_rotation, lsuffix='_Synchrony', rsuffix='_face_rotation')
 #merged_data = total_synchrony.join(total_face_movement, lsuffix='_Synchrony', rsuffix='_face_movement')
+#merged_data = group_performance.join(total_body_movement, lsuffix='_performance', rsuffix='_body_movement')
+merged_data = group_performance.join(total_lip_distance, lsuffix='_performance', rsuffix='_lip_distance')
 
 # NaN 값이 있는 행 제거
 cleaned_data = merged_data.dropna()
@@ -432,25 +450,31 @@ weeks = ['1W', '2W', '3W', '4W']
 # 그룹별 주차 평균 계산
 group_names = cleaned_data.index
 avg_performance = cleaned_data[[f'{week}_performance' for week in weeks]].mean(axis=1)
+
 #avg_synchrony = cleaned_data[[f'{week}_Synchrony' for week in weeks]].mean(axis=1)
 #avg_face_rotation = cleaned_data[[f'{week}_face_rotation' for week in weeks]].mean(axis=1)
-avg_face_movement = cleaned_data[[f'{week}_face_movement' for week in weeks]].mean(axis=1)
+#avg_face_movement = cleaned_data[[f'{week}_face_movement' for week in weeks]].mean(axis=1)
+#avg_body_movement = cleaned_data[[f'{week}_body_movement' for week in weeks]].mean(axis=1)
+avg_lip_distance = cleaned_data[[f'{week}_lip_distance' for week in weeks]].mean(axis=1)
 
 avg_data = pd.DataFrame({
     'Group': group_names,
     'Average Performance': avg_performance,
     #'Average Synchrony': avg_synchrony,
     #'Average face rotation' : avg_face_rotation,
-    'Average face movement' : avg_face_movement
+    #'Average face movement' : avg_face_movement,
+    #'Average body movement' : avg_body_movement.
+    'Average lip distance' : avg_lip_distance
 })
 
 plt.figure(figsize=(10, 6))
 
 # 산점도 그리기
 #scatter = sns.scatterplot(data=avg_data, x='Average Performance', y='Average Synchrony', hue='Group', palette='tab10', s=100)
-scatter = sns.scatterplot(data=avg_data, x='Average Performance', y='Average face movement', hue='Group', palette='tab10', s=100)
+#scatter = sns.scatterplot(data=avg_data, x='Average Performance', y='Average face movement', hue='Group', palette='tab10', s=100)
 #scatter = sns.scatterplot(data=avg_data, x='Average Synchrony', y='Average face movement', hue='Group', palette='tab10', s=100)
-
+#scatter = sns.scatterplot(data=avg_data, x='Average Performance', y='Average body movement', hue='Group', palette='tab10', s=100)
+scatter = sns.scatterplot(data=avg_data, x='Average Performance', y='Average lip distance', hue='Group', palette='tab10', s=100)
 
 # 각 그룹별 평균값 주석 추가
 for index, row in avg_data.iterrows():
@@ -458,15 +482,17 @@ for index, row in avg_data.iterrows():
     performance_mean = row['Average Performance']
     #synchrony_mean = row['Average Synchrony']
     #face_rotation_mean = row['Average face rotation'] # rotation
-    face_movement_mean = row['Average face movement']
-    annotation_text = f'{group}: ({performance_mean:.2f}, {face_movement_mean:.2f})' # performance_mean
-    plt.annotate(annotation_text, xy=(performance_mean, face_movement_mean), # performance_mean
+    #face_movement_mean = row['Average face movement']
+    #body_movement_mean = row['Average body movement']
+    lip_distance_mean = row['Average lip distance']
+    annotation_text = f'{group}: ({performance_mean:.2f}, {lip_distance_mean:.2f})' # performance_mean
+    plt.annotate(annotation_text, xy=(performance_mean, lip_distance_mean), # performance_mean
                  xytext=(5, 5), textcoords='offset points', fontsize=10,
                  bbox=dict(boxstyle='round,pad=0.3', facecolor='white', alpha=0.5))
 
-plt.title('Average Synchrony vs. face movement by Group') # Synchrony
+plt.title('Average Synchrony vs. lip distance by Group') # Synchrony
 plt.xlabel('Average Performance') # Performance
-plt.ylabel('Average face movement') # Average Synchrony
+plt.ylabel('Average lip distance') # Average Synchrony
 
 #x,y 축에 대한 범위를 조정해주기 위한 코드 
 #plt.xlim(10, 50)
@@ -474,10 +500,9 @@ plt.ylabel('Average face movement') # Average Synchrony
 
 plt.legend(title='Group')
 plt.tight_layout()
-plt.savefig(os.path.join(save_path, 'Average_Group_performance_vs_face_movement_by_groups.png')) # _synchrony_by_group.png'
+plt.savefig(os.path.join(save_path, 'Average_Group_performance_vs_lip_distance_by_groups.png')) # _synchrony_by_group.png'
 #plt.show()
 plt.close()
-'''
 
 
 # 그룹 별 어디에 분포되어 있는지 annotate 한 부분. 
