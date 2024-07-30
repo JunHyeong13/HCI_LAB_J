@@ -220,125 +220,133 @@ plt.close()
 
 # face synchrony week값과 그룹의 성과 week 값 간의 상관관계를 그리는 코드. 
 
-import os
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
-from scipy.stats import pearsonr
+# import os
+# import pandas as pd
+# import numpy as np
+# import matplotlib.pyplot as plt
+# import seaborn as sns
+# from scipy.stats import pearsonr
 
-# 파일 경로
-group_performance_file = 'C:/Users/user/Desktop/Group_performance.xlsx'
-# 주차 별, pitch x 값의 변화량을 average한 값. 
-#total_synchrony_file = 'D:/MultiModal/MultiModal_Model/Head_Rotation_Mouse/face_Synchrony/total_synchrony(delta)_1.xlsx'
+# # 파일 경로
+# #group_performance_file = 'C:/Users/user/Desktop/Group_performance.xlsx'
+# # 주차 별, pitch x 값의 변화량을 average한 값. 
+# total_synchrony_file = 'D:/MultiModal/MultiModal_Model/Head_Rotation_Mouse/face_Synchrony/total_synchrony(delta)_1.xlsx'
 
-# 얼굴 총 움직임량 값을 average한 값. 
-face_total = 'C:/Users/user/Documents/Face_Rotation_total.xlsx'
+# # 얼굴 총 움직임량 값을 average한 값. 
+# face_total = 'C:/Users/user/Documents/Face_Rotation_total.xlsx'
 
-# plot을 저장하기 위한 부분.
-save_path = 'D:/MultiModal/MultiModal_Model/Head_Rotation_Mouse/face_Synchrony/'
+# # plot을 저장하기 위한 부분.
+# save_path = 'D:/MultiModal/MultiModal_Model/Head_Rotation_Mouse/face_Synchrony/'
 
-# 데이터 불러오기
-group_performance = pd.read_excel(group_performance_file)
-#total_synchrony = pd.read_excel(total_synchrony_file)
-# 얼굴 총 움직임량 값 불러오는 위치.
-total_face_rotation = pd.read_excel(face_total)
+# # 데이터 불러오기
+# #group_performance = pd.read_excel(group_performance_file)
+# total_synchrony = pd.read_excel(total_synchrony_file)
+# # 얼굴 총 움직임량 값 불러오는 위치.
+# total_face_rotation = pd.read_excel(face_total)
 
-# 그룹 이름을 인덱스로 설정
-group_performance.set_index('Unnamed: 0', inplace=True)
-#total_synchrony.set_index('Unnamed: 0', inplace=True)
-total_face_rotation.set_index('Unnamed: 0', inplace=True)
+# # 그룹 이름을 인덱스로 설정
+# #group_performance.set_index('Unnamed: 0', inplace=True)
+# total_synchrony.set_index('Unnamed: 0', inplace=True)
+# total_face_rotation.set_index('Unnamed: 0', inplace=True)
 
-# print(group_performance.columns)
-# print(total_face_rotation.columns)
+# # print(group_performance.columns)
+# # print(total_face_rotation.columns)
 
-# 두 데이터프레임 병합
-#merged_data = group_performance.join(total_synchrony, lsuffix='_performance', rsuffix='_synchrony')
-merged_data = group_performance.join(total_face_rotation, lsuffix='_performance', rsuffix='_face_rotation')
+# # 두 데이터프레임 병합(X 축에는 그룹 성과 점수)
+# #merged_data = group_performance.join(total_synchrony, lsuffix='_performance', rsuffix='_synchrony')
+# #merged_data = group_performance.join(total_face_rotation, lsuffix='_performance', rsuffix='_face_rotation')
 
-# NaN 값이 있는 행 제거
-cleaned_data = merged_data.dropna()
+# '''
+# y 축에는 총 얼굴 회전량 값을 넣어주기 위함.
+# '''
+# merged_data = total_synchrony.join(total_face_rotation, lsuffix='_Synchrony', rsuffix='_face_rotation')
 
-# 각 주차별로 성능과 동기화 데이터 간의 상관관계 및 산점도 그리기
-weeks = ['1W', '2W', '3W', '4W']
+# # NaN 값이 있는 행 제거
+# cleaned_data = merged_data.dropna()
 
-# x축과 y축 값의 범주 계산
-# x_min = cleaned_data[[f'{week}_performance' for week in weeks]].min().min()
-# x_max = cleaned_data[[f'{week}_performance' for week in weeks]].max().max()
-# y_min = cleaned_data[[f'{week}_face rotation' for week in weeks]].min().min()
-# y_max = cleaned_data[[f'{week}_face rotation' for week in weeks]].max().max()
+# # 각 주차별로 성능과 동기화 데이터 간의 상관관계 및 산점도 그리기
+# weeks = ['1W', '2W', '3W', '4W']
 
-#cleaned_data.reset_index(inplace=True)
+# # x축과 y축 값의 범주 계산
+# # x_min = cleaned_data[[f'{week}_performance' for week in weeks]].min().min()
+# # x_max = cleaned_data[[f'{week}_performance' for week in weeks]].max().max()
+# # y_min = cleaned_data[[f'{week}_face rotation' for week in weeks]].min().min()
+# # y_max = cleaned_data[[f'{week}_face rotation' for week in weeks]].max().max()
 
-# 그룹 이름에 None 값이 있는 경우 'Group'으로 대체
-#cleaned_data['Unnamed: 0'] = cleaned_data['Unnamed: 0'].fillna('Group')
+# #cleaned_data.reset_index(inplace=True)
 
-# 데이터를 길게 변환
-long_data = pd.DataFrame()
+# # 그룹 이름에 None 값이 있는 경우 'Group'으로 대체
+# #cleaned_data['Unnamed: 0'] = cleaned_data['Unnamed: 0'].fillna('Group')
 
-for week in weeks:
-    temp_df = cleaned_data[[f'{week}_performance', f'{week}_face_rotation']].copy()
-    temp_df.columns = ['Performance', 'face_rotation'] # 'Synchrony'
-    temp_df['Week'] = week
-    temp_df['Group'] = cleaned_data.index
-    long_data = pd.concat([long_data, temp_df])
+# # 데이터를 길게 변환
+# long_data = pd.DataFrame()
 
+# for week in weeks:
+#     temp_df = cleaned_data[[f'{week}_Synchrony', f'{week}_face_rotation']].copy() # _performance
+#     temp_df.columns = ['Synchrony', 'face_rotation'] # 'Synchrony'
+#     temp_df['Week'] = week
+#     temp_df['Group'] = cleaned_data.index
+#     long_data = pd.concat([long_data, temp_df])
 
-plt.figure(figsize=(14, 10))
+# plt.figure(figsize=(14, 10))
 
+# # 산점도 그리기
+# scatter = sns.scatterplot(data=long_data, x='Synchrony', y='face_rotation', hue='Group', style='Week', palette='tab10', s=100)
+# sns.regplot(data=long_data, x='Synchrony', y='face_rotation', scatter=False)
 
-# 산점도 그리기
-scatter = sns.scatterplot(data=long_data, x='Performance', y='face_rotation', hue='Group', style='Week', palette='tab10', s=100)
-sns.regplot(data=long_data, x='Performance', y='face_rotation', scatter=False)
-
-# 각 주차별 상관관계 및 p-value 계산 및 주석 추가
-for week in weeks:
-    week_data = long_data[long_data['Week'] == week]
-    corr, p_value = pearsonr(week_data['Performance'], week_data['face_rotation'])
-    corr_text = f'{week}: r={corr:.2f}, p={p_value:.2e}'
-    plt.annotate(corr_text, xy=(0.05, 0.95 - 0.05 * weeks.index(week)), xycoords='axes fraction', fontsize=12, 
-                 verticalalignment='top', bbox=dict(boxstyle='round,pad=0.5', facecolor='white', alpha=0.5))
-
-
-'''
-이전에 하나의 그래프가 아닌 4개의 그래프로 값을 따로 보여줄 떄의 코드 
-'''
-
-# for i, week in enumerate(weeks, 1):
-#     x = cleaned_data[f'{week}_performance']
-#     y = cleaned_data[f'{week}_synchrony']
-#     #y = cleaned_data[f'{week}_face rotation']
-    
-#     # 상관관계 및 p-value 계산
-#     corr, p_value = pearsonr(x, y)
+# # 각 주차별 상관관계 및 p-value 계산 및 주석 추가
+# for week in weeks:
+#     week_data = long_data[long_data['Week'] == week]
+#     corr, p_value = pearsonr(week_data['Synchrony'], week_data['face_rotation'])
 #     corr_text = f'{week}: r={corr:.2f}, p={p_value:.2e}'
-    
-#     # 산점도 그리기
-#     plt.subplot(2, 2, i)
-#     #sns.scatterplot(x=x, y=y)
-    
-#     # 각 그룹 명을 표시해주기 위해, 다음과 같이 설정. 
-#     # 하나의 그래프에 모두 표시 
-#     scatter = sns.scatterplot(x=x, y=y, hue=cleaned_data['Unnamed: 0'], style=week, palette='tab10', s=100)
-#     #sns.regplot(x=x, y=y, scatter=False, ax=plt.gca())
-#     sns.regplot(x=x, y=y, scatter=False, label=corr_text)
-    
-'''
-plt 을 출력하기 위한 이름, 저장하기 위한 코드 정립. 
-'''
-plt.title('Scatter Plot of Performance vs. face rotation (1W to 4W)')
-plt.xlabel('Performance')
-plt.ylabel('face rotation')
-plt.xlim(10, 50)
-plt.ylim(0.0, 3.0) # (0.0, 3.0) (-0.005, 0.025)
+#     plt.annotate(corr_text, xy=(0.05, 0.95 - 0.05 * weeks.index(week)), xycoords='axes fraction', fontsize=12, 
+#                  verticalalignment='top', bbox=dict(boxstyle='round,pad=0.5', facecolor='white', alpha=0.5))
 
-plt.legend(title='Group & Week', bbox_to_anchor=(1.05, 1), loc='upper left')
-plt.tight_layout()
-plt.savefig(os.path.join(save_path, 'Group_performance_vs_face_rotation_all_weeks.png'))
-#plt.show()
-plt.close()
-    
 
+# '''
+# 이전에 하나의 그래프가 아닌 4개의 그래프로 값을 따로 보여줄 떄의 코드 
+# '''
+
+# # for i, week in enumerate(weeks, 1):
+# #     x = cleaned_data[f'{week}_performance']
+# #     y = cleaned_data[f'{week}_synchrony']
+# #     #y = cleaned_data[f'{week}_face rotation']
+    
+# #     # 상관관계 및 p-value 계산
+# #     corr, p_value = pearsonr(x, y)
+# #     corr_text = f'{week}: r={corr:.2f}, p={p_value:.2e}'
+    
+# #     # 산점도 그리기
+# #     plt.subplot(2, 2, i)
+# #     #sns.scatterplot(x=x, y=y)
+    
+# #     # 각 그룹 명을 표시해주기 위해, 다음과 같이 설정. 
+# #     # 하나의 그래프에 모두 표시 
+# #     scatter = sns.scatterplot(x=x, y=y, hue=cleaned_data['Unnamed: 0'], style=week, palette='tab10', s=100)
+# #     #sns.regplot(x=x, y=y, scatter=False, ax=plt.gca())
+# #     sns.regplot(x=x, y=y, scatter=False, label=corr_text)
+    
+# '''
+# plt 을 출력하기 위한 이름, 저장하기 위한 코드 정립. 
+# '''
+# plt.title('Scatter Plot of Group Synchrony vs. face rotation (1W to 4W)')
+# plt.xlabel('Synchrony')
+# plt.ylabel('face rotation')
+
+# '''
+# x,y 축의 범위를 조정해줄 때 사용하는 코드.
+# '''
+# #plt.xlim(10, 50)
+# #plt.ylim(0.0, 3.0) # (0.0, 3.0) (-0.005, 0.025)
+
+# plt.legend(title='Group & Week', bbox_to_anchor=(1.05, 1), loc='upper left')
+# plt.tight_layout()
+# plt.savefig(os.path.join(save_path, 'Group_Synchrony_vs_face_rotation_all_weeks.png'))
+# #plt.show()
+# plt.close()
+
+'''
+이전에 코딩한 부분. 
 #     plt.title(f'Scatter Plot of {week}_performance vs. {week}_synchrony')
 #     #plt.title(f'Scatter Plot of {week}_performance vs. {week}_face rotation')
 #     plt.xlabel(f'{week}_performance')
@@ -367,87 +375,95 @@ plt.close()
 # plt.close()
 
 
+'''
+
 # 주차별로 average()한 값을 출력해줄것.
-# import os
-# import pandas as pd
-# import numpy as np
-# import matplotlib.pyplot as plt
-# import seaborn as sns
-# from scipy.stats import pearsonr
+import os
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from scipy.stats import pearsonr
 
-# # 파일 경로
-# group_performance_file = 'C:/Users/user/Desktop/Group_performance.xlsx'
-# #total_synchrony_file = 'D:/MultiModal/MultiModal_Model/Head_Rotation_Mouse/face_Synchrony/total_synchrony(delta)_1.xlsx'
-# #
-# # 얼굴 총 움직임량 값을 average한 값. 
-# face_total = 'C:/Users/user/Documents/Face_Rotation_total.xlsx'
+# 파일 경로
+#group_performance_file = 'C:/Users/user/Desktop/Group_performance.xlsx'
+total_synchrony_file = 'D:/MultiModal/MultiModal_Model/Head_Rotation_Mouse/face_Synchrony/total_synchrony(delta)_1.xlsx'
 
-# # plot을 저장하기 위한 부분.
-# save_path = 'D:/MultiModal/MultiModal_Model/Head_Rotation_Mouse/face_Synchrony/'
+# 얼굴 총 움직임량 값을 average한 값. 
+face_total = 'C:/Users/user/Documents/Face_Rotation_total.xlsx'
 
-# # 데이터 불러오기
-# group_performance = pd.read_excel(group_performance_file)
-# #total_synchrony = pd.read_excel(total_synchrony_file)
-# # 얼굴 총 움직임량 값 불러오는 위치.
-# total_face_rotation = pd.read_excel(face_total)
+# plot을 저장하기 위한 부분.
+save_path = 'D:/MultiModal/MultiModal_Model/Head_Rotation_Mouse/face_Synchrony/'
+
+# 데이터 불러오기
+#group_performance = pd.read_excel(group_performance_file)
+total_synchrony = pd.read_excel(total_synchrony_file)
+# 얼굴 총 움직임량 값 불러오는 위치.
+total_face_rotation = pd.read_excel(face_total)
 
 
-# # 그룹 이름을 인덱스로 설정
-# group_performance.set_index(group_performance.columns[0], inplace=True)
-# #total_synchrony.set_index(total_synchrony.columns[0], inplace=True)
-# total_face_rotation.set_index(total_face_rotation.columns[0], inplace=True)
+# 그룹 이름을 인덱스로 설정
+#group_performance.set_index(group_performance.columns[0], inplace=True)
+total_synchrony.set_index(total_synchrony.columns[0], inplace=True)
+total_face_rotation.set_index(total_face_rotation.columns[0], inplace=True)
 
-# # 두 데이터프레임 병합
-# #merged_data = group_performance.join(total_synchrony, lsuffix='_performance', rsuffix='_synchrony')
-# merged_data = group_performance.join(total_face_rotation, lsuffix='_performance', rsuffix='_face_rotation')
+# 두 데이터프레임 병합
+#merged_data = group_performance.join(total_synchrony, lsuffix='_performance', rsuffix='_synchrony')
+#merged_data = group_performance.join(total_face_rotation, lsuffix='_performance', rsuffix='_face_rotation')
+merged_data = total_synchrony.join(total_face_rotation, lsuffix='_Synchrony', rsuffix='_face_rotation')
 
-# # NaN 값이 있는 행 제거
-# cleaned_data = merged_data.dropna()
+# NaN 값이 있는 행 제거
+cleaned_data = merged_data.dropna()
 
-# # 각 주차별로 성능과 동기화 데이터 간의 상관관계 및 산점도 그리기
-# weeks = ['1W', '2W', '3W', '4W']
+# 각 주차별로 성능과 동기화 데이터 간의 상관관계 및 산점도 그리기
+weeks = ['1W', '2W', '3W', '4W']
 
-# # 그룹별 주차 평균 계산
-# group_names = cleaned_data.index
-# avg_performance = cleaned_data[[f'{week}_performance' for week in weeks]].mean(axis=1)
-# #avg_synchrony = cleaned_data[[f'{week}_synchrony' for week in weeks]].mean(axis=1)
-# avg_face_rotation = cleaned_data[[f'{week}_face_rotation' for week in weeks]].mean(axis=1)
+# 그룹별 주차 평균 계산
+group_names = cleaned_data.index
+#avg_performance = cleaned_data[[f'{week}_performance' for week in weeks]].mean(axis=1)
+avg_synchrony = cleaned_data[[f'{week}_Synchrony' for week in weeks]].mean(axis=1)
+avg_face_rotation = cleaned_data[[f'{week}_face_rotation' for week in weeks]].mean(axis=1)
 
-# avg_data = pd.DataFrame({
-#     'Group': group_names,
-#     'Average Performance': avg_performance,
-#     #'Average Synchrony': avg_synchrony
-#     'Average face rotation' : avg_face_rotation
-# })
+avg_data = pd.DataFrame({
+    'Group': group_names,
+    #'Average Performance': avg_performance,
+    'Average Synchrony': avg_synchrony,
+    'Average face rotation' : avg_face_rotation
+})
 
-# plt.figure(figsize=(10, 6))
+plt.figure(figsize=(10, 6))
 
-# # 산점도 그리기
-# #scatter = sns.scatterplot(data=avg_data, x='Average Performance', y='Average Synchrony', hue='Group', palette='tab10', s=100)
-# scatter = sns.scatterplot(data=avg_data, x='Average Performance', y='Average face rotation', hue='Group', palette='tab10', s=100)
+# 산점도 그리기
+#scatter = sns.scatterplot(data=avg_data, x='Average Performance', y='Average Synchrony', hue='Group', palette='tab10', s=100)
+#scatter = sns.scatterplot(data=avg_data, x='Average Performance', y='Average face rotation', hue='Group', palette='tab10', s=100)
+scatter = sns.scatterplot(data=avg_data, x='Average Synchrony', y='Average face rotation', hue='Group', palette='tab10', s=100)
 
-# # 각 그룹별 평균값 주석 추가
-# for index, row in avg_data.iterrows():
-#     group = row['Group']
-#     performance_mean = row['Average Performance']
-#     #synchrony_mean = row['Average Synchrony']
-#     face_rotation_mean = row['Average face rotation']
-#     annotation_text = f'{group}: ({performance_mean:.2f}, {face_rotation_mean:.2f})'
-#     plt.annotate(annotation_text, xy=(performance_mean, face_rotation_mean),
-#                  xytext=(5, 5), textcoords='offset points', fontsize=10,
-#                  bbox=dict(boxstyle='round,pad=0.3', facecolor='white', alpha=0.5))
+# 각 그룹별 평균값 주석 추가
+for index, row in avg_data.iterrows():
+    group = row['Group']
+    #performance_mean = row['Average Performance']
+    synchrony_mean = row['Average Synchrony']
+    face_rotation_mean = row['Average face rotation']
+    annotation_text = f'{group}: ({synchrony_mean:.2f}, {face_rotation_mean:.2f})' # performance_mean
+    plt.annotate(annotation_text, xy=(synchrony_mean, face_rotation_mean), # performance_mean
+                 xytext=(5, 5), textcoords='offset points', fontsize=10,
+                 bbox=dict(boxstyle='round,pad=0.3', facecolor='white', alpha=0.5))
 
-# plt.title('Average Performance vs. face rotation by Group') # Synchrony
-# plt.xlabel('Average Performance')
-# plt.ylabel('Average face rotation') # Average Synchrony
-# plt.xlim(10, 50)
-# plt.ylim(0.0, 3.0) # -0.005, 0.025
+plt.title('Average Synchrony vs. face rotation by Group') # Synchrony
+plt.xlabel('Average Synchrony') # Performance
+plt.ylabel('Average face rotation') # Average Synchrony
 
-# plt.legend(title='Group')
-# plt.tight_layout()
-# plt.savefig(os.path.join(save_path, 'Average_performance_vs_face_rotation_by_group.png')) # _synchrony_by_group.png'
-# #plt.show()
-# plt.close()
+'''
+x,y 축에 대한 범위를 조정해주기 위한 코드 
+'''
+#plt.xlim(10, 50)
+#plt.ylim(0.0, 3.0) # -0.005, 0.025
+
+plt.legend(title='Group')
+plt.tight_layout()
+plt.savefig(os.path.join(save_path, 'Average_Synchrony_vs_face_rotation_by_group.png')) # _synchrony_by_group.png'
+#plt.show()
+plt.close()
 
 '''
 
