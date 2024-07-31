@@ -217,7 +217,7 @@ if valid_files:
     plt.plot(time_seconds[window_size // 2:len(rolling_correlations_filtered) + window_size // 2], rolling_correlations_filtered, label='Rolling Filtered', color='green')
     plt.xlabel('Time (seconds)')
     plt.ylabel('Rolling Window Pearson Correlation')
-    plt.ylim(-1.0, 1.0)
+    #plt.ylim(-1.0, 1.0)
     plt.title(f'Rolling Window Pearson Correlation\nAvg Raw Correlation: {avg_rolling_correlation_raw:.2f}\nAvg Filtered Correlation: {avg_rolling_correlation_filtered:.2f}')
     max_time = max(time_seconds)
     x_ticks = range(0, int(max_time) + 60, 60)
