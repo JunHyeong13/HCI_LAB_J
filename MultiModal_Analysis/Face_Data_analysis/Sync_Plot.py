@@ -56,7 +56,6 @@ def pearson_cross_correlation(signal1, signal2):
     
     return pearson_corr
 
-
 def rolling_window_correlation(signal1, signal2, window_size):
     num_samples = len(signal1)
     correlations = []
@@ -128,7 +127,7 @@ for file in csv_files:
 if valid_files:
     # Load data and extract the column of interest
     data_xlse = [pd.read_csv(file) for file in csv_files]
-    data = [df['X'] for df in data_xlse] # X , Y, Z, Delta_X, Delta_Y, Delta_Z
+    data = [df['X'] for df in data_xlse] # X , Y, Z, Delta_X, Delta_Y, Delta_Z 
 
     # Define frame rate and time window
     frame_rate = 25  # frames per second
