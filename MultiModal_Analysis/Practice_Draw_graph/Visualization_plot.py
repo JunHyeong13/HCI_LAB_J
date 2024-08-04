@@ -317,5 +317,3 @@ print(results_df)
 # plt.savefig(os.path.join(save_path,'correlation_scatter_plots.png'))  # Save the scatter plots as a PNG file
 # #plt.show()
 # plt.close()
-
-'''
