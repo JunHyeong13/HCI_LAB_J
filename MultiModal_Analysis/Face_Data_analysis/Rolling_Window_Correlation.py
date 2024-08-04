@@ -81,7 +81,6 @@ for group in tqdm(group_name, desc = "Groups"): # desc: 진행 바 앞에 문자
                 # 추출하고 싶은 데이터 값을 넣어 둠. 
                 data_xlse = [pd.read_csv(file) for file in csv_files]
                 data = [df['Delta_X'] for df in data_xlse] # X, Y, Z, Delta_X, Delta_Y, Delta_Z, Lip_Distance
-                # 현재 코드 기준에서는 , X 축을 본거고, delta x 값을 기준으로 안 뽑았군
                 
                 frame_rate = 25
                 data_frame_section = pd.DataFrame() # 네 개의 신호 간 모든 쌍에 대해 상관 관계를 계산하여 section_means 값에 저장. 
