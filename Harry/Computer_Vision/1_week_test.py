@@ -8,7 +8,6 @@
 # cv2.waitKey(0) # 잠시 대기 
 
 
-
 import numpy as np  # 수치 계산과 배열 처리를 위한 라이브러리
 import cv2         # 컴퓨터 비전 관련 기능을 제공하는 OpenCV 라이브러리
 
